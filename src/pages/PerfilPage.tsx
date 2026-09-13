@@ -5,13 +5,22 @@ import type { MemberProfileWithRole } from '@/lib/supabase';
 import { DEFAULT_BANNER } from '@/lib/constants';
 import { Btn } from '@/components/layout/Btn';
 import { BiolinkCard } from '@/components/profile/BiolinkCard';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 export default function PerfilPage() {
   const { username } = useParams();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<MemberProfileWithRole | null | undefined>(undefined);
 
+  useDocumentTitle(
+    profile ? profile.display_name || profile.username : username ? `@${username}` : 'Perfil',
+  );
+
   useEffect(() => {
+    if (!username) {
+      setProfile(null);
+      return;
+    }
     let cancelled = false;
     setProfile(undefined);
     supabase

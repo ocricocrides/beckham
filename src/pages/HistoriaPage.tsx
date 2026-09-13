@@ -1,4 +1,5 @@
 import { Wrap, SectionHead } from '@/components/layout/Wrap';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const TIMELINE = [
   {
@@ -24,6 +25,7 @@ const TIMELINE = [
 ];
 
 export default function HistoriaPage() {
+  useDocumentTitle('História');
   return (
     <Wrap>
       <SectionHead title="História" description="De onde a BECKHAM veio e o que ela representa hoje." />

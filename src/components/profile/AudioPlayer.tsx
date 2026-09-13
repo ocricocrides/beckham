@@ -56,12 +56,16 @@ export function AudioPlayer({ url }: { url: string }) {
         onClick={toggle}
         className="flex-none w-[38px] h-[38px] rounded-full border border-line bg-brand/10 text-brand flex items-center justify-center hover:border-brand"
       >
-        <svg viewBox="0 0 24 24" width={17} height={17} fill="currentColor" hidden={playing}>
-          <path d="M8 5v14l11-7z" />
-        </svg>
-        <svg viewBox="0 0 24 24" width={17} height={17} fill="currentColor" hidden={!playing}>
-          <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
-        </svg>
+        {!playing && (
+          <svg viewBox="0 0 24 24" width={17} height={17} fill="currentColor">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        )}
+        {playing && (
+          <svg viewBox="0 0 24 24" width={17} height={17} fill="currentColor">
+            <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+          </svg>
+        )}
       </button>
       <div className="flex-1 min-w-0 overflow-hidden">
         <div className="inline-block whitespace-nowrap w-full overflow-hidden">

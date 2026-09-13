@@ -10,7 +10,7 @@ const variants = {
   primary: 'bg-brand border-brand text-[#0a0a0a] hover:bg-[#ff3d55] hover:border-[#ff3d55]',
 } as const;
 
-export interface BtnProps extends ButtonProps {
+export interface BtnProps extends Omit<ButtonProps, 'variant'> {
   variant?: keyof typeof variants;
 }
 

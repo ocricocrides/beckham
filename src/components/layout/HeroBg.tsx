@@ -43,7 +43,7 @@ export function HeroBg() {
 
   return (
     <div
-      className="fixed inset-0 -z-10 overflow-hidden pointer-events-none transition-opacity duration-[400ms]"
+      className="fixed inset-0 -z-10 overflow-hidden pointer-events-none transition-opacity duration-500"
       style={{ opacity: isHome ? 1 : 0.35 }}
     >
       <div
