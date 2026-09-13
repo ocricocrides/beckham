@@ -27,7 +27,7 @@ export default function InicioPage() {
         </picture>
 
         <p className="max-w-[520px] mt-[18px] text-[1.15rem] text-ink-dim leading-[1.6]">
-          Nascida em 2018 de um grupo que competia em campeonatos no FiveM, hoje é uma facção ativa no Lado Leste.
+          Começou nos campeonatos do FiveM em 2018. Hoje tá no Lado Leste.
         </p>
 
         <div className="flex flex-wrap mt-8 border-t border-line">

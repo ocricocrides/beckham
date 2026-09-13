@@ -10,7 +10,7 @@ export default function MembrosPage() {
 
   return (
     <Wrap>
-      <SectionHead title="Membros" description="Quem forma a BECKHAM hoje — do fundador aos associados mais recentes." />
+      <SectionHead title="Membros" description="Quem faz parte da BECKHAM hoje." />
       <AccountsBar />
       <MembersGrid onSelect={(p) => navigate(`/perfil/${p.username}`)} />
     </Wrap>

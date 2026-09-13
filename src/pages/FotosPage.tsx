@@ -6,7 +6,7 @@ export default function FotosPage() {
   useDocumentTitle('Fotos');
   return (
     <Wrap>
-      <SectionHead title="Fotos" description="Registros da organização em eventos, reuniões e atividades oficiais." />
+      <SectionHead title="Fotos" description="Fotos das lembranças que já vivemos e do que ainda está por vir." />
       <GalleryGrid />
     </Wrap>
   );
