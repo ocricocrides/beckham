@@ -8,6 +8,7 @@ import { useRoles } from '@/hooks/useRoles';
 import { useDiscordRoles, type DiscordRole } from '@/hooks/useDiscordRoles';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useConfirm } from '@/hooks/useConfirm';
+import { ColorPicker } from '@/components/ui/color-picker';
 
 const selectClass = 'font-body bg-panel border border-line text-ink px-2.5 py-1.5 text-[0.85rem]';
 
@@ -25,6 +26,11 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
   const [roleName, setRoleName] = useState('');
   const [roleOrder, setRoleOrder] = useState('');
   const [roleColor, setRoleColor] = useState(BRAND_RED);
+
+  // Cores já aplicadas em outros cargos, oferecidas como atalho dentro do seletor.
+  const coresEmUso = Array.from(
+    new Set(roles.map((r) => r.color).filter((c): c is string => !!c)),
+  );
   const [msg, setMsg] = useState('');
   const [msgKind, setMsgKind] = useState<'' | 'error' | 'success'>('');
 
@@ -188,18 +194,17 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
             {roles.map((r) => (
               <div key={r.id} className="bg-panel-2 border border-line px-3 py-2.5 text-[0.9rem]">
                 <div className="flex items-center gap-2.5">
-                  <input
-                    type="color"
+                  <ColorPicker
                     value={r.color || BRAND_RED}
-                    onChange={(e) => handleRoleColorChange(r.id, e.target.value)}
+                    onChange={(hex) => handleRoleColorChange(r.id, hex)}
                     disabled={!!r.discord_role_id}
+                    recentes={coresEmUso}
                     title={
                       r.discord_role_id
                         ? 'A cor vem do Discord. Desvincule pra editar na mão.'
                         : `Cor do cargo ${r.name}`
                     }
                     aria-label={`Cor do cargo ${r.name}`}
-                    className="w-7 h-7 shrink-0 cursor-pointer bg-transparent border border-line p-0.5 disabled:cursor-not-allowed disabled:opacity-60"
                   />
                   <span className="flex-1 font-semibold" style={{ color: r.color || BRAND_RED }}>
                     {r.name}
@@ -253,13 +258,13 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
           </div>
 
           <form className="flex gap-2 flex-wrap" onSubmit={handleAddRole}>
-            <input
-              type="color"
+            <ColorPicker
               value={roleColor}
-              onChange={(e) => setRoleColor(e.target.value)}
-              title="Cor do cargo"
+              onChange={setRoleColor}
+              recentes={coresEmUso}
+              title="Cor do novo cargo"
               aria-label="Cor do novo cargo"
-              className="w-9 shrink-0 cursor-pointer bg-transparent border border-line p-0.5"
+              className="w-9 h-9"
             />
             <input
               value={roleName}
