@@ -1,14 +1,6 @@
 // Lista os cargos do servidor do Discord com as cores de lá, pra que o painel ADM possa
 // espelhar um cargo do site num cargo do Discord e herdar a cor.
-//
-// A cor no Discord vem como inteiro decimal (0 = "sem cor", que o cliente renderiza como
-// cinza padrão); aqui ela é convertida pra hex. Precisa do DISCORD_BOT_TOKEN nas variáveis
-// de ambiente da Vercel, e o bot precisa estar dentro do servidor.
-// Servidor de onde os cargos são lidos. Hoje é o servidor de TESTE, que é onde o bot está.
-// Quando o bot entrar no servidor oficial da BECKHAM (1065057205201678436), basta criar a
-// variável DISCORD_GUILD_ID na Vercel com o id novo — não precisa mexer neste arquivo.
-const TEST_GUILD_ID = '1547760799722901528';
-const GUILD_ID = process.env.DISCORD_GUILD_ID || TEST_GUILD_ID;
+import { fetchGuildRoles, guildId } from './_discord.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -16,46 +8,19 @@ export default async function handler(req, res) {
 
   const token = process.env.DISCORD_BOT_TOKEN;
   if (!token) {
+    res.setHeader('Cache-Control', 'no-store');
     return res.status(500).send(
       JSON.stringify({ error: 'DISCORD_BOT_TOKEN não está configurado neste deploy.' }),
     );
   }
 
   try {
-    const r = await fetch(`https://discord.com/api/v10/guilds/${GUILD_ID}/roles`, {
-      headers: { Authorization: `Bot ${token}` },
-    });
-
-    if (!r.ok) {
-      res.setHeader('Cache-Control', 'no-store');
-      return res.status(r.status).send(
-        JSON.stringify({
-          error: 'Não consegui ler os cargos do Discord.',
-          discordStatus: r.status,
-          dica:
-            r.status === 404
-              ? 'O bot não está dentro desse servidor.'
-              : 'Verifique o DISCORD_BOT_TOKEN.',
-        }),
-      );
-    }
-
-    const roles = await r.json();
-    const limpos = roles
-      // @everyone e cargos de integração (bots, boosters) não servem como cargo de membro.
-      .filter((role) => role.name !== '@everyone' && !role.managed)
-      .sort((a, b) => b.position - a.position)
-      .map((role) => ({
-        id: role.id,
-        name: role.name,
-        position: role.position,
-        // 0 no Discord significa "sem cor definida" — devolve null pro site usar o padrão dele.
-        color: role.color ? `#${role.color.toString(16).padStart(6, '0')}` : null,
-      }));
-
-    return res.status(200).send(JSON.stringify({ guildId: GUILD_ID, roles: limpos }));
+    const roles = await fetchGuildRoles(token);
+    return res.status(200).send(JSON.stringify({ guildId: guildId(), roles }));
   } catch (e) {
     res.setHeader('Cache-Control', 'no-store');
-    return res.status(500).send(JSON.stringify({ error: String(e && e.message) }));
+    return res.status(e.status || 500).send(
+      JSON.stringify({ error: 'Não consegui ler os cargos do Discord.', dica: e.message }),
+    );
   }
 }

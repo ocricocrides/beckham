@@ -18,17 +18,21 @@ export function useDiscordRoles(enabled: boolean) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const reload = useCallback(async () => {
+  /** Devolve a lista recém-lida (ou null se falhar), pra quem chamou poder agir na hora. */
+  const reload = useCallback(async (): Promise<DiscordRole[] | null> => {
     setLoading(true);
     setError(null);
     try {
       const res = await fetch('/api/discord-roles');
       const body = await res.json();
       if (!res.ok) throw new Error(body?.dica || body?.error || 'Falha ao ler os cargos.');
-      setRoles(body.roles as DiscordRole[]);
+      const lista = body.roles as DiscordRole[];
+      setRoles(lista);
+      return lista;
     } catch (e) {
       setRoles(null);
       setError(e instanceof Error ? e.message : 'Falha ao ler os cargos do Discord.');
+      return null;
     } finally {
       setLoading(false);
     }

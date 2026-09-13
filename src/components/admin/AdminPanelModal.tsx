@@ -1,11 +1,11 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Btn } from '@/components/layout/Btn';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useRoles } from '@/hooks/useRoles';
-import { useDiscordRoles } from '@/hooks/useDiscordRoles';
+import { useDiscordRoles, type DiscordRole } from '@/hooks/useDiscordRoles';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useConfirm } from '@/hooks/useConfirm';
 
@@ -79,43 +79,63 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
     reloadProfiles();
   }
 
-  /** Repuxa as cores do Discord pros cargos já vinculados. */
-  async function handleSyncDiscordColors() {
-    const atuais = await reloadDiscordAndGet();
-    if (!atuais) return;
+  /**
+   * Grava nos cargos vinculados a cor que está hoje no Discord. Devolve quantos mudaram.
+   * Cargo apagado lá não é mexido — melhor manter a cor antiga do que zerar sem aviso.
+   */
+  async function aplicarCoresDoDiscord(lista: DiscordRole[]) {
     const vinculados = roles.filter((r) => r.discord_role_id);
     let mudou = 0;
     for (const r of vinculados) {
-      const d = atuais.find((x) => x.id === r.discord_role_id);
+      const d = lista.find((x) => x.id === r.discord_role_id);
       if (!d || d.color === r.color) continue;
       const { error } = await supabase.from('roles').update({ color: d.color }).eq('id', r.id);
       if (!error) mudou++;
     }
+    if (mudou > 0) {
+      reloadRoles();
+      reloadProfiles();
+    }
+    return { vinculados: vinculados.length, mudou };
+  }
+
+  /** Botão manual: relê o Discord e aplica, sempre com resposta na tela. */
+  async function handleSyncDiscordColors() {
+    const lista = await reloadDiscord();
+    if (!lista) {
+      setMsgKind('error');
+      setMsg('Não consegui ler os cargos do Discord agora.');
+      return;
+    }
+    const { vinculados, mudou } = await aplicarCoresDoDiscord(lista);
     setMsgKind('success');
     setMsg(
-      vinculados.length === 0
+      vinculados === 0
         ? 'Nenhum cargo está espelhado no Discord ainda.'
         : mudou === 0
           ? 'As cores já estavam em dia.'
           : `${mudou} cor(es) atualizada(s) a partir do Discord.`,
     );
-    reloadRoles();
-    reloadProfiles();
   }
 
-  async function reloadDiscordAndGet() {
-    await reloadDiscord();
-    try {
-      const res = await fetch('/api/discord-roles');
-      const body = await res.json();
-      if (!res.ok) throw new Error(body?.dica || body?.error);
-      return body.roles as { id: string; name: string; color: string | null }[];
-    } catch (e) {
-      setMsgKind('error');
-      setMsg('Erro ao ler o Discord: ' + (e instanceof Error ? e.message : 'falha'));
-      return null;
+  // Sincronização automática: toda vez que o painel abre e os cargos do Discord chegam,
+  // as cores vinculadas são conferidas em silêncio. Só avisa na tela se algo mudou.
+  const autoSyncFeito = useRef(false);
+  useEffect(() => {
+    if (!open) {
+      autoSyncFeito.current = false;
+      return;
     }
-  }
+    if (autoSyncFeito.current || !discordRoles || roles.length === 0) return;
+    autoSyncFeito.current = true;
+    aplicarCoresDoDiscord(discordRoles).then(({ mudou }) => {
+      if (mudou > 0) {
+        setMsgKind('success');
+        setMsg(`${mudou} cor(es) sincronizada(s) do Discord.`);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, discordRoles, roles]);
 
   async function handleDeleteRole(id: string) {
     if (!(await confirm('Excluir esse cargo? Membros com ele ficam sem cargo.'))) return;
