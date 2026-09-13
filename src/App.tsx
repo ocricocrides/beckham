@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import InicioPage from '@/pages/InicioPage';
 import MembrosPage from '@/pages/MembrosPage';
@@ -10,6 +11,19 @@ import PerfilPage from '@/pages/PerfilPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 function App() {
+  const navigate = useNavigate();
+
+  // Shim: a rota /perfil/:username antiga (via api/perfil/[username].js, que serve tags OG
+  // pros crawlers) redireciona navegadores reais pra /#perfil/{username}. Aqui a gente pega
+  // esse hash uma vez no boot e entra na rota de verdade do react-router.
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (hash.startsWith('perfil/')) {
+      navigate(`/${hash}`, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Routes>
       <Route element={<Layout />}>
