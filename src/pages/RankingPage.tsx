@@ -1,9 +1,9 @@
 import { Wrap, SectionHead } from '@/components/layout/Wrap';
 import { RankingList } from '@/components/ranking/RankingList';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 export default function RankingPage() {
-  useDocumentTitle('Ranking');
+  usePageMeta('Ranking', 'Ranking de ações por membro, calculado a partir do histórico registrado no Discord.');
   return (
     <Wrap>
       <SectionHead title="Ranking" description="Winrate de ações por membro, calculado a partir do histórico registrado no Discord." />

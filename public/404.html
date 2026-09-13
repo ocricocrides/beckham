@@ -157,10 +157,22 @@
   }
   .btn:hover{ background:#ff3d55; }
 
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink);
+  }
+  .btn-ghost:hover{ background:rgba(255,22,51,0.12); }
+
+  .actions{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+
+  .footer-link{ color:var(--ink-dim); text-decoration:none; }
+  .footer-link:hover{ color:var(--red); }
+
   footer{
     border-top:1px solid var(--line);
     padding:26px 5vw;
     display:flex; justify-content:center; align-items:center;
+    gap:18px; flex-wrap:wrap; text-align:center;
     color:var(--ink-dim);
     font-size:0.8rem;
     position:relative; z-index:1;
@@ -180,10 +192,14 @@
   <h1>404</h1>
   <h2>Essa página não existe.</h2>
   <p>O conteúdo que você tentou acessar foi removido, mudou de endereço ou nunca existiu no território da BECKHAM.</p>
-  <a class="btn" href="/">Voltar para o início</a>
+  <div class="actions">
+    <a class="btn" href="/">Voltar para o início</a>
+    <a class="btn btn-ghost" href="https://discord.gg/beckham" target="_blank" rel="noopener noreferrer">Falar no Discord</a>
+  </div>
 </main>
 
 <footer>
+  <a class="footer-link" href="https://discord.gg/beckham" target="_blank" rel="noopener noreferrer">Suporte e contato: Discord</a>
   <span>© 2026 — Organização fictícia para fins de roleplay em FiveM.</span>
 </footer>
 

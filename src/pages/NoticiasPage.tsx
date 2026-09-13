@@ -1,9 +1,9 @@
 import { Wrap, SectionHead } from '@/components/layout/Wrap';
 import { AnnouncementsList } from '@/components/news/AnnouncementsList';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 export default function NoticiasPage() {
-  useDocumentTitle('Notícias');
+  usePageMeta('Notícias', 'Comunicados e avisos oficiais da BECKHAM.');
   return (
     <Wrap>
       <SectionHead title="Notícias" description="Anúncios oficiais da organização, publicados direto do Discord." />

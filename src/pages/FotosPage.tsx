@@ -1,9 +1,9 @@
 import { Wrap, SectionHead } from '@/components/layout/Wrap';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 export default function FotosPage() {
-  useDocumentTitle('Fotos');
+  usePageMeta('Fotos', 'Fotos das lembranças que já vivemos e do que ainda está por vir na BECKHAM.');
   return (
     <Wrap>
       <SectionHead title="Fotos" description="Fotos das lembranças que já vivemos e do que ainda está por vir." />

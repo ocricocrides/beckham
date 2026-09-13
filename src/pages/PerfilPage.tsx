@@ -5,15 +5,16 @@ import type { MemberProfileWithRole } from '@/lib/supabase';
 import { DEFAULT_BANNER } from '@/lib/constants';
 import { Btn } from '@/components/layout/Btn';
 import { BiolinkCard } from '@/components/profile/BiolinkCard';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 export default function PerfilPage() {
   const { username } = useParams();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<MemberProfileWithRole | null | undefined>(undefined);
 
-  useDocumentTitle(
+  usePageMeta(
     profile ? profile.display_name || profile.username : username ? `@${username}` : 'Perfil',
+    profile?.bio || `Perfil de ${username ? '@' + username : 'membro'} na BECKHAM.`,
   );
 
   useEffect(() => {

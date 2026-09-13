@@ -1,5 +1,5 @@
 import { Wrap, SectionHead } from '@/components/layout/Wrap';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 const TIMELINE = [
   {
@@ -25,7 +25,7 @@ const TIMELINE = [
 ];
 
 export default function HistoriaPage() {
-  useDocumentTitle('História');
+  usePageMeta('História', 'A trajetória da BECKHAM, desde o primeiro campeonato de FiveM em 2018 até o Lado Leste.');
   return (
     <Wrap>
       <SectionHead title="História" description="A trajetória da BECKHAM, desde o primeiro campeonato até virar o que ela é hoje." />

@@ -1,8 +1,14 @@
 import { Wrap } from '@/components/layout/Wrap';
 import { Btn } from '@/components/layout/Btn';
 import { useDiscordWidget } from '@/hooks/useDiscordWidget';
+import { usePageMeta } from '@/hooks/usePageMeta';
+import { DISCORD_INVITE } from '@/lib/constants';
 
 export default function InicioPage() {
+  usePageMeta(
+    'Início',
+    'Organização de roleplay FiveM fundada em 2018, hoje no Lado Leste. Membros, história, fotos e ranking da BECKHAM.',
+  );
   const widget = useDiscordWidget();
 
   return (
@@ -30,6 +36,25 @@ export default function InicioPage() {
           Começou nos campeonatos do FiveM em 2018. Hoje tá no Lado Leste.
         </p>
 
+        {/* O convite fixo sempre aparece — é o único canal de contato. A bolinha de "online" só
+            entra quando o widget do Discord responde (precisa estar ligado nas configs do server). */}
+        <div className="mt-6 flex items-center gap-3.5 flex-wrap text-ink-dim text-[0.9rem]">
+          {widget && (
+            <>
+              <span
+                className="w-[9px] h-[9px] rounded-full bg-[#3ddc84] inline-block"
+                style={{ boxShadow: '0 0 6px #3ddc84' }}
+              />
+              <span>{widget.presenceCount} online</span>
+            </>
+          )}
+          <Btn asChild variant="outline">
+            <a href={widget?.inviteUrl || DISCORD_INVITE} target="_blank" rel="noopener noreferrer">
+              Entrar no Discord
+            </a>
+          </Btn>
+        </div>
+
         <div className="flex flex-wrap mt-8 border-t border-line">
           <div className="flex-1 basis-1/2 min-[701px]:basis-auto pt-[22px] pr-6 pb-4 min-[701px]:pb-0 border-b min-[701px]:border-b-0 border-line">
             <div className="text-[2.1rem] leading-[2.4rem] font-bold text-brand font-display">2018</div>
@@ -45,22 +70,6 @@ export default function InicioPage() {
           </div>
         </div>
 
-        {widget && (
-          <div className="mt-8 flex items-center gap-3.5 flex-wrap text-ink-dim text-[0.9rem]">
-            <span
-              className="w-[9px] h-[9px] rounded-full bg-[#3ddc84] inline-block"
-              style={{ boxShadow: '0 0 6px #3ddc84' }}
-            />
-            <span>{widget.presenceCount} online</span>
-            {widget.inviteUrl && (
-              <Btn asChild variant="outline">
-                <a href={widget.inviteUrl} target="_blank" rel="noopener noreferrer">
-                  Entrar no Discord
-                </a>
-              </Btn>
-            )}
-          </div>
-        )}
       </Wrap>
     </div>
   );

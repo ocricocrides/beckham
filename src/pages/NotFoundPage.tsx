@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { Wrap } from '@/components/layout/Wrap';
 import { Btn } from '@/components/layout/Btn';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 export default function NotFoundPage() {
-  useDocumentTitle('Página não encontrada');
+  usePageMeta('Página não encontrada', 'Essa página não existe. Volte ao início da BECKHAM.');
   const navigate = useNavigate();
 
   return (
