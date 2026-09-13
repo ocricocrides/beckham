@@ -4,15 +4,11 @@
 // A cor no Discord vem como inteiro decimal (0 = "sem cor", que o cliente renderiza como
 // cinza padrão); aqui ela é convertida pra hex. Precisa do DISCORD_BOT_TOKEN nas variáveis
 // de ambiente da Vercel, e o bot precisa estar dentro do servidor.
-const GUILD_ID = '1065057205201678436';
-
-// Busca os cargos de um servidor. Devolve { ok, status, body }.
-async function fetchRoles(guildId, token) {
-  const r = await fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, {
-    headers: { Authorization: `Bot ${token}` },
-  });
-  return { ok: r.ok, status: r.status, body: r.ok ? await r.json() : await r.text() };
-}
+// Servidor de onde os cargos são lidos. Hoje é o servidor de TESTE, que é onde o bot está.
+// Quando o bot entrar no servidor oficial da BECKHAM (1065057205201678436), basta criar a
+// variável DISCORD_GUILD_ID na Vercel com o id novo — não precisa mexer neste arquivo.
+const TEST_GUILD_ID = '1547760799722901528';
+const GUILD_ID = process.env.DISCORD_GUILD_ID || TEST_GUILD_ID;
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -26,46 +22,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    let guildId = GUILD_ID;
-    let attempt = await fetchRoles(guildId, token);
+    const r = await fetch(`https://discord.com/api/v10/guilds/${GUILD_ID}/roles`, {
+      headers: { Authorization: `Bot ${token}` },
+    });
 
-    // Se o bot não estiver no servidor configurado, descobre em quais ele está. Quando há só
-    // um, usa esse — evita depender de um id chumbado que pode não bater com o bot real.
-    if (!attempt.ok) {
-      const gr = await fetch('https://discord.com/api/v10/users/@me/guilds', {
-        headers: { Authorization: `Bot ${token}` },
-      });
-      const guilds = gr.ok ? await gr.json() : [];
-      if (guilds.length === 1) {
-        guildId = guilds[0].id;
-        attempt = await fetchRoles(guildId, token);
-      } else if (guilds.length > 1) {
-        res.setHeader('Cache-Control', 'no-store');
-        return res.status(409).send(
-          JSON.stringify({
-            error: 'O bot está em mais de um servidor. Diga qual usar.',
-            guildConfigurado: GUILD_ID,
-            servidoresDoBot: guilds.map((g) => ({ id: g.id, name: g.name })),
-          }),
-        );
-      }
-    }
-
-    if (!attempt.ok) {
+    if (!r.ok) {
       res.setHeader('Cache-Control', 'no-store');
-      return res.status(attempt.status).send(
+      return res.status(r.status).send(
         JSON.stringify({
           error: 'Não consegui ler os cargos do Discord.',
-          discordStatus: attempt.status,
-          discordBody: String(attempt.body).slice(0, 300),
-          tokenValido: true,
-          guildTentado: guildId,
-          dica: 'O bot precisa estar dentro do servidor pra enxergar os cargos.',
+          discordStatus: r.status,
+          dica:
+            r.status === 404
+              ? 'O bot não está dentro desse servidor.'
+              : 'Verifique o DISCORD_BOT_TOKEN.',
         }),
       );
     }
 
-    const roles = attempt.body;
+    const roles = await r.json();
     const limpos = roles
       // @everyone e cargos de integração (bots, boosters) não servem como cargo de membro.
       .filter((role) => role.name !== '@everyone' && !role.managed)
@@ -78,7 +53,7 @@ export default async function handler(req, res) {
         color: role.color ? `#${role.color.toString(16).padStart(6, '0')}` : null,
       }));
 
-    return res.status(200).send(JSON.stringify({ guildId, roles: limpos }));
+    return res.status(200).send(JSON.stringify({ guildId: GUILD_ID, roles: limpos }));
   } catch (e) {
     res.setHeader('Cache-Control', 'no-store');
     return res.status(500).send(JSON.stringify({ error: String(e && e.message) }));
