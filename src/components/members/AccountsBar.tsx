@@ -1,17 +1,13 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { ProfileEditorModal } from '@/components/profile/ProfileEditorModal';
 import { Btn } from '@/components/layout/Btn';
 
-export function AccountsBar({
-  onOpenEditor,
-  onOpenAdmin,
-}: {
-  onOpenEditor?: () => void;
-  onOpenAdmin?: () => void;
-}) {
+export function AccountsBar({ onOpenAdmin }: { onOpenAdmin?: () => void }) {
   const { user, profile } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
 
   return (
     <div className="mt-7 flex items-center justify-between gap-3.5 flex-wrap pb-7 border-b border-line">
@@ -26,7 +22,7 @@ export function AccountsBar({
           <span className="text-brand font-bold font-display text-[0.85rem]">
             @{profile?.username ?? '...'}
           </span>
-          <Btn variant="outline" onClick={onOpenEditor}>
+          <Btn variant="outline" onClick={() => setEditorOpen(true)}>
             Meu Perfil
           </Btn>
           {profile?.is_admin && (
@@ -37,6 +33,7 @@ export function AccountsBar({
         </div>
       )}
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
+      <ProfileEditorModal open={editorOpen} onOpenChange={setEditorOpen} />
     </div>
   );
 }
