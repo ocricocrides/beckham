@@ -5,7 +5,7 @@ import { GlowCard } from '@/components/glow-card/GlowCard';
 export function MemberCard({ profile, onClick }: { profile: MemberProfileWithRole; onClick: () => void }) {
   return (
     <GlowCard
-      className="bg-panel p-[26px_22px] transition-colors hover:bg-panel-2 cursor-pointer overflow-hidden"
+      className="bg-panel rounded-2xl shadow-[0_1rem_2rem_-1rem_black] p-[26px_22px] transition-colors hover:bg-panel-2 cursor-pointer overflow-hidden"
       onClick={onClick}
     >
       <div

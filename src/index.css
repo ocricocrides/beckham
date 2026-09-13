@@ -93,6 +93,7 @@
     );
     background-attachment: fixed;
     border: var(--border-size) solid rgba(255, 22, 51, 0.12);
+    border-radius: inherit;
     transition: border-color 0.2s ease;
   }
   [data-glow]::before,
@@ -102,6 +103,7 @@
     position: absolute;
     inset: calc(var(--border-size) * -1);
     border: var(--border-size) solid transparent;
+    border-radius: inherit;
     background-attachment: fixed;
     background-repeat: no-repeat;
     mask: linear-gradient(transparent, transparent), linear-gradient(white, white);
