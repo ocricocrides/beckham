@@ -1,13 +1,15 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FormField, inputClass } from '@/components/layout/FormField';
 import { Btn } from '@/components/layout/Btn';
+import { BiolinkCard } from '@/components/profile/BiolinkCard';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
+import type { MemberProfileWithRole } from '@/lib/supabase';
 
 type MsgKind = '' | 'error' | 'success';
 
@@ -200,10 +202,48 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     onOpenChange(false);
   }
 
+  const previewProfile: MemberProfileWithRole | null = useMemo(() => {
+    if (!profile) return null;
+    return {
+      ...profile,
+      roles: null,
+      display_name: displayName.trim() || profile.username,
+      location: location.trim() || null,
+      bio: bio.trim() || null,
+      music_url: music.trim() || null,
+      instagram_url: instagram.trim() || null,
+      x_url: x.trim() || null,
+      youtube_url: youtube.trim() || null,
+      twitch_url: twitch.trim() || null,
+      discord_url: discord.trim() || null,
+      share_image: shareImage,
+      avatar_url: avatarPreview || (avatarRemoved ? null : profile.avatar_url),
+      banner_url: bannerPreview || (bannerRemoved ? null : profile.banner_url),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    profile,
+    displayName,
+    location,
+    bio,
+    music,
+    instagram,
+    x,
+    youtube,
+    twitch,
+    discord,
+    shareImage,
+    avatarPreview,
+    avatarRemoved,
+    bannerPreview,
+    bannerRemoved,
+  ]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-panel border border-line rounded-none clip-corner-panel p-9 max-w-[560px] max-h-[88vh] overflow-y-auto text-ink [&>button]:text-ink-dim [&>button]:opacity-100 [&>button:hover]:text-brand">
+      <DialogContent className="bg-panel border border-line rounded-none clip-corner-panel p-9 max-w-[940px] max-h-[88vh] overflow-y-auto text-ink [&>button]:text-ink-dim [&>button]:opacity-100 [&>button:hover]:text-brand">
         <h3 className="text-[1.4rem] mb-5 text-ink">Meu Perfil</h3>
+        <div className="grid lg:grid-cols-[1fr_320px] gap-8 items-start">
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <FormField label="Nome de exibição" htmlFor="pfDisplayName">
             <Input id="pfDisplayName" required maxLength={40} className={inputClass} value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
@@ -318,6 +358,12 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
             {msg}
           </div>
         </form>
+
+        <div className="lg:sticky lg:top-0">
+          <p className="text-ink-dim text-[0.75rem] tracking-wide uppercase mb-3">Pré-visualização</p>
+          {previewProfile && <BiolinkCard profile={previewProfile} />}
+        </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
