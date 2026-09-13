@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Btn } from '@/components/layout/Btn';
 import { SocialIcon, type SocialKind } from './SocialIcon';
 import { MusicEmbed } from './MusicEmbed';
+import { GlowCard } from '@/components/glow-card/GlowCard';
 import { DEFAULT_AVATAR, DEFAULT_BANNER } from '@/lib/constants';
 import type { MemberProfileWithRole } from '@/lib/supabase';
 
@@ -32,7 +33,7 @@ export function BiolinkCard({ profile }: { profile: MemberProfileWithRole }) {
   }
 
   return (
-    <div className="bg-panel border border-line overflow-hidden">
+    <GlowCard className="bg-panel overflow-hidden">
       <div
         className="relative z-[1] h-[150px] bg-[#0b0b0c] bg-cover bg-center [filter:saturate(1.1)]"
         style={{
@@ -70,6 +71,6 @@ export function BiolinkCard({ profile }: { profile: MemberProfileWithRole }) {
           {copyLabel}
         </Btn>
       </div>
-    </div>
+    </GlowCard>
   );
 }

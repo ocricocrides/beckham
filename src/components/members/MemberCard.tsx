@@ -1,9 +1,13 @@
 import type { MemberProfileWithRole } from '@/lib/supabase';
 import { DEFAULT_AVATAR } from '@/lib/constants';
+import { GlowCard } from '@/components/glow-card/GlowCard';
 
 export function MemberCard({ profile, onClick }: { profile: MemberProfileWithRole; onClick: () => void }) {
   return (
-    <div className="bg-panel p-[26px_22px] transition-colors hover:bg-panel-2 cursor-pointer" onClick={onClick}>
+    <GlowCard
+      className="bg-panel p-[26px_22px] transition-colors hover:bg-panel-2 cursor-pointer overflow-hidden"
+      onClick={onClick}
+    >
       <div
         className="w-[52px] h-[52px] mb-4 clip-corner-avatar bg-cover bg-center"
         style={{
@@ -16,6 +20,6 @@ export function MemberCard({ profile, onClick }: { profile: MemberProfileWithRol
         <div className="text-brand text-[0.78rem] font-bold tracking-wide my-1.5">{profile.roles.name.toUpperCase()}</div>
       )}
       <p className="text-ink-dim text-[0.88rem] leading-[1.5]">{profile.bio}</p>
-    </div>
+    </GlowCard>
   );
 }
