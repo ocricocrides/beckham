@@ -16,7 +16,7 @@ function useDrift() {
       const tx = randomBetween(-12, 12);
       const ty = randomBetween(-12, 12);
       const scale = randomBetween(0.85, 1.15);
-      const duration = randomBetween(5, 9);
+      const duration = randomBetween(1.5, 3);
       setStyle({ transform: `translate(${tx}vw, ${ty}vh) scale(${scale})`, transitionDuration: `${duration}s` });
       timeoutId = setTimeout(driftToNewTarget, duration * 1000);
     }
