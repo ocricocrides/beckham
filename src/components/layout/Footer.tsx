@@ -48,7 +48,7 @@ export function Footer() {
           Suporte e contato: Discord
         </a>
         <div className="max-[760px]:w-full max-[760px]:text-center max-[760px]:text-[0.72rem]">
-          © 2026 — Organização fictícia para fins de roleplay em FiveM.
+          © 2026 BECKHAM — A comunidade é real. O que acontece no jogo é roleplay.
         </div>
       </div>
     </footer>

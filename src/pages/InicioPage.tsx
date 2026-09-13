@@ -38,7 +38,7 @@ export default function InicioPage() {
 
         {/* O convite fixo sempre aparece — é o único canal de contato. A bolinha de "online" só
             entra quando o widget do Discord responde (precisa estar ligado nas configs do server). */}
-        <div className="mt-6 flex items-center gap-3.5 flex-wrap text-ink-dim text-[0.9rem]">
+        <div className="mt-6 flex items-center justify-center gap-3.5 flex-wrap text-ink-dim text-[0.9rem]">
           {widget && (
             <>
               <span
