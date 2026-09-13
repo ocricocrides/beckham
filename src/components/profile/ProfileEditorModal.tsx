@@ -36,8 +36,10 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarRemoved, setAvatarRemoved] = useState(false);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [bannerRemoved, setBannerRemoved] = useState(false);
 
   const [msg, setMsg] = useState('');
   const [msgKind, setMsgKind] = useState<MsgKind>('');
@@ -60,8 +62,10 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     setShareImage((profile.share_image as 'avatar' | 'banner') || 'avatar');
     setAvatarFile(null);
     setAvatarPreview(null);
+    setAvatarRemoved(false);
     setBannerFile(null);
     setBannerPreview(null);
+    setBannerRemoved(false);
     setMsg('');
     setMsgKind('');
     refreshDiscordLinkStatus();
@@ -116,12 +120,26 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     const file = e.target.files?.[0] ?? null;
     setAvatarFile(file);
     setAvatarPreview(file ? URL.createObjectURL(file) : null);
+    if (file) setAvatarRemoved(false);
   }
 
   function onBannerChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
     setBannerFile(file);
     setBannerPreview(file ? URL.createObjectURL(file) : null);
+    if (file) setBannerRemoved(false);
+  }
+
+  function handleRemoveAvatar() {
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    setAvatarRemoved(true);
+  }
+
+  function handleRemoveBanner() {
+    setBannerFile(null);
+    setBannerPreview(null);
+    setBannerRemoved(true);
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -131,8 +149,16 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     setMsgKind('');
     setMsg('Salvando...');
     try {
-      const avatar_url = avatarFile ? await uploadMedia(user.id, avatarFile, 'avatar') : profile.avatar_url ?? null;
-      const banner_url = bannerFile ? await uploadMedia(user.id, bannerFile, 'banner') : profile.banner_url ?? null;
+      const avatar_url = avatarFile
+        ? await uploadMedia(user.id, avatarFile, 'avatar')
+        : avatarRemoved
+          ? null
+          : profile.avatar_url ?? null;
+      const banner_url = bannerFile
+        ? await uploadMedia(user.id, bannerFile, 'banner')
+        : bannerRemoved
+          ? null
+          : profile.banner_url ?? null;
 
       const payload = {
         id: user.id,
@@ -152,6 +178,12 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
       };
       const { error } = await supabase.from('member_profiles').upsert(payload);
       if (error) throw error;
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      setAvatarRemoved(false);
+      setBannerFile(null);
+      setBannerPreview(null);
+      setBannerRemoved(false);
       setMsgKind('success');
       setMsg('Perfil salvo!');
       await refreshProfile();
@@ -186,12 +218,36 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
           <FormField label="Avatar (imagem)" htmlFor="pfAvatarFile">
             <Input id="pfAvatarFile" type="file" accept="image/*" className={inputClass} onChange={onAvatarChange} />
           </FormField>
-          {avatarPreview && <img src={avatarPreview} alt="Prévia do avatar" className="w-24 h-24 object-cover border border-line -mt-2" />}
+          {(avatarPreview || (!avatarRemoved && profile?.avatar_url)) && (
+            <div className="flex items-center gap-3 -mt-2">
+              <img
+                src={avatarPreview || profile?.avatar_url || ''}
+                alt="Prévia do avatar"
+                className="w-24 h-24 object-cover border border-line"
+              />
+              <Btn type="button" variant="outline" onClick={handleRemoveAvatar}>
+                Remover avatar
+              </Btn>
+            </div>
+          )}
+          {avatarRemoved && <p className="text-ink-dim text-[0.8rem] -mt-2">Avatar padrão será usado ao salvar.</p>}
 
           <FormField label="Banner (imagem)" htmlFor="pfBannerFile">
             <Input id="pfBannerFile" type="file" accept="image/*" className={inputClass} onChange={onBannerChange} />
           </FormField>
-          {bannerPreview && <img src={bannerPreview} alt="Prévia do banner" className="w-full h-20 object-cover border border-line -mt-2" />}
+          {(bannerPreview || (!bannerRemoved && profile?.banner_url)) && (
+            <div className="flex flex-col gap-2 -mt-2">
+              <img
+                src={bannerPreview || profile?.banner_url || ''}
+                alt="Prévia do banner"
+                className="w-full h-20 object-cover border border-line"
+              />
+              <Btn type="button" variant="outline" onClick={handleRemoveBanner} className="self-start">
+                Remover banner
+              </Btn>
+            </div>
+          )}
+          {bannerRemoved && <p className="text-ink-dim text-[0.8rem] -mt-2">Banner padrão será usado ao salvar.</p>}
 
           <FormField label="Imagem ao compartilhar o link do perfil (Discord, WhatsApp etc.)" htmlFor="pfShareImage">
             <Select value={shareImage} onValueChange={(v) => setShareImage(v as 'avatar' | 'banner')}>
