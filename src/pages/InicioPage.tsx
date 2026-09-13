@@ -32,7 +32,8 @@ export default function InicioPage() {
           />
         </picture>
 
-        <p className="max-w-[520px] mt-[18px] text-[1.15rem] text-ink-dim leading-[1.6]">
+        {/* text-wrap:balance evita que a última palavra caia sozinha numa linha órfã. */}
+        <p className="max-w-[520px] mx-auto text-center [text-wrap:balance] mt-[18px] text-[1.15rem] text-ink-dim leading-[1.6]">
           Uma família. Uma tropa. Uma organização. Oito anos depois, ainda de pé.
         </p>
 
