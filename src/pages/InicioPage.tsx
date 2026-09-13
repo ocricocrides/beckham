@@ -33,7 +33,7 @@ export default function InicioPage() {
         </picture>
 
         <p className="max-w-[520px] mt-[18px] text-[1.15rem] text-ink-dim leading-[1.6]">
-          Começou como uma família dentro de um servidor em 2018. Oito anos depois, ainda de pé.
+          Uma família. Uma tropa. Uma organização. Oito anos depois, ainda de pé.
         </p>
 
         {/* O convite fixo sempre aparece — é o único canal de contato. A bolinha de "online" só
