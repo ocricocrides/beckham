@@ -10,7 +10,7 @@ function escapeHtml(str) {
   return String(str || '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 }
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const username = String(req.query.username || '').toLowerCase();
   let profile = null;
 
