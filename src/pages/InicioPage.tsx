@@ -61,7 +61,7 @@ export default function InicioPage() {
             <div className="text-[0.8rem] text-ink-dim tracking-wide mt-1">FUNDAÇÃO</div>
           </div>
           <div className="flex-1 basis-1/2 min-[701px]:basis-auto pt-[22px] pr-6 pb-4 min-[701px]:pb-0 border-b min-[701px]:border-b-0 border-line">
-            <div className="text-[2.1rem] leading-[2.4rem] font-bold text-brand font-display">12</div>
+            <div className="text-[2.1rem] leading-[2.4rem] font-bold text-brand font-display">40+</div>
             <div className="text-[0.8rem] text-ink-dim tracking-wide mt-1">MEMBROS ATIVOS</div>
           </div>
           <div className="flex-1 basis-1/2 min-[701px]:basis-auto pt-[22px] pr-0 pb-0">
