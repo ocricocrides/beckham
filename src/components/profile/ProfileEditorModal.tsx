@@ -241,9 +241,9 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-panel border border-line rounded-none clip-corner-panel p-9 max-w-[940px] max-h-[88vh] overflow-y-auto text-ink [&>button]:text-ink-dim [&>button]:opacity-100 [&>button:hover]:text-brand">
+      <DialogContent className="bg-panel border border-line rounded-none clip-corner-panel p-9 max-w-[1040px] max-h-[88vh] overflow-y-auto text-ink [&>button]:text-ink-dim [&>button]:opacity-100 [&>button:hover]:text-brand">
         <h3 className="text-[1.4rem] mb-5 text-ink">Meu Perfil</h3>
-        <div className="grid lg:grid-cols-[1fr_320px] gap-8 items-start">
+        <div className="grid lg:grid-cols-[1fr_400px] gap-8 items-start">
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <FormField label="Nome de exibição" htmlFor="pfDisplayName">
             <Input id="pfDisplayName" required maxLength={40} className={inputClass} value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
