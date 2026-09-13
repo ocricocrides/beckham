@@ -23,6 +23,10 @@
     font-weight: 500;
     overflow-x: hidden;
   }
+  img {
+    user-select: none;
+    -webkit-user-drag: none;
+  }
 
   /* textura de fundo - grid + scanline sutil */
   body::before {
