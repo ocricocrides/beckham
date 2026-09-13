@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FormField, inputClass } from '@/components/layout/FormField';
+import { FormField, inputClass, fileInputClass } from '@/components/layout/FormField';
 import { Btn } from '@/components/layout/Btn';
 import { BiolinkCard } from '@/components/profile/BiolinkCard';
 import { cn } from '@/lib/utils';
@@ -256,7 +256,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
           </FormField>
 
           <FormField label="Avatar (imagem)" htmlFor="pfAvatarFile">
-            <Input id="pfAvatarFile" type="file" accept="image/*" className={inputClass} onChange={onAvatarChange} />
+            <Input id="pfAvatarFile" type="file" accept="image/*" className={fileInputClass} onChange={onAvatarChange} />
           </FormField>
           {(avatarPreview || (!avatarRemoved && profile?.avatar_url)) && (
             <div className="flex items-center gap-3 -mt-2">
@@ -273,7 +273,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
           {avatarRemoved && <p className="text-ink-dim text-[0.8rem] -mt-2">Avatar padrão será usado ao salvar.</p>}
 
           <FormField label="Banner (imagem)" htmlFor="pfBannerFile">
-            <Input id="pfBannerFile" type="file" accept="image/*" className={inputClass} onChange={onBannerChange} />
+            <Input id="pfBannerFile" type="file" accept="image/*" className={fileInputClass} onChange={onBannerChange} />
           </FormField>
           {(bannerPreview || (!bannerRemoved && profile?.banner_url)) && (
             <div className="flex flex-col gap-2 -mt-2">
