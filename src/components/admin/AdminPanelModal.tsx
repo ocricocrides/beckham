@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useRoles } from '@/hooks/useRoles';
+import { useDiscordRoles } from '@/hooks/useDiscordRoles';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useConfirm } from '@/hooks/useConfirm';
 
@@ -16,6 +17,8 @@ const BRAND_RED = '#ff1633';
 export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const { user, refreshProfile } = useAuth();
   const { roles, reload: reloadRoles } = useRoles();
+  const { discordRoles, error: discordError, loading: discordLoading, reload: reloadDiscord } =
+    useDiscordRoles(open);
   const { profiles, reload: reloadProfiles } = useProfiles();
   const confirm = useConfirm();
 
@@ -56,6 +59,62 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
     setMsg('Cor do cargo atualizada.');
     reloadRoles();
     reloadProfiles();
+  }
+
+  /** Liga (ou desliga) um cargo do site a um cargo do Discord, herdando a cor de lá. */
+  async function handleDiscordLink(roleId: string, discordRoleId: string) {
+    const alvo = discordRoles?.find((d) => d.id === discordRoleId);
+    const patch = discordRoleId
+      ? { discord_role_id: discordRoleId, color: alvo?.color ?? null }
+      : { discord_role_id: null };
+    const { error } = await supabase.from('roles').update(patch).eq('id', roleId);
+    if (error) {
+      setMsgKind('error');
+      setMsg('Erro: ' + error.message);
+      return;
+    }
+    setMsgKind('success');
+    setMsg(discordRoleId ? `Cargo espelhado em "${alvo?.name}".` : 'Vínculo removido.');
+    reloadRoles();
+    reloadProfiles();
+  }
+
+  /** Repuxa as cores do Discord pros cargos já vinculados. */
+  async function handleSyncDiscordColors() {
+    const atuais = await reloadDiscordAndGet();
+    if (!atuais) return;
+    const vinculados = roles.filter((r) => r.discord_role_id);
+    let mudou = 0;
+    for (const r of vinculados) {
+      const d = atuais.find((x) => x.id === r.discord_role_id);
+      if (!d || d.color === r.color) continue;
+      const { error } = await supabase.from('roles').update({ color: d.color }).eq('id', r.id);
+      if (!error) mudou++;
+    }
+    setMsgKind('success');
+    setMsg(
+      vinculados.length === 0
+        ? 'Nenhum cargo está espelhado no Discord ainda.'
+        : mudou === 0
+          ? 'As cores já estavam em dia.'
+          : `${mudou} cor(es) atualizada(s) a partir do Discord.`,
+    );
+    reloadRoles();
+    reloadProfiles();
+  }
+
+  async function reloadDiscordAndGet() {
+    await reloadDiscord();
+    try {
+      const res = await fetch('/api/discord-roles');
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.dica || body?.error);
+      return body.roles as { id: string; name: string; color: string | null }[];
+    } catch (e) {
+      setMsgKind('error');
+      setMsg('Erro ao ler o Discord: ' + (e instanceof Error ? e.message : 'falha'));
+      return null;
+    }
   }
 
   async function handleDeleteRole(id: string) {
@@ -107,33 +166,72 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
           <div className="flex flex-col gap-2 mb-3.5">
             {roles.length === 0 && <p className="text-ink-dim text-[0.85rem]">Nenhum cargo criado ainda.</p>}
             {roles.map((r) => (
-              <div key={r.id} className="flex items-center gap-2.5 bg-panel-2 border border-line px-3 py-2.5 text-[0.9rem]">
-                <input
-                  type="color"
-                  value={r.color || BRAND_RED}
-                  onChange={(e) => handleRoleColorChange(r.id, e.target.value)}
-                  title={`Cor do cargo ${r.name}`}
-                  aria-label={`Cor do cargo ${r.name}`}
-                  className="w-7 h-7 shrink-0 cursor-pointer bg-transparent border border-line p-0.5"
-                />
-                <span
-                  className="flex-1 font-semibold"
-                  style={{ color: r.color || BRAND_RED }}
-                >
-                  {r.name}
-                </span>
-                <span className="text-ink-dim text-[0.78rem]">ordem {r.sort_order}</span>
-                <button
-                  type="button"
-                  title="Excluir cargo"
-                  onClick={() => handleDeleteRole(r.id)}
-                  className="bg-none border-none text-ink-dim hover:text-brand cursor-pointer text-[1.1rem] leading-none px-1.5 py-0.5"
-                >
-                  ×
-                </button>
+              <div key={r.id} className="bg-panel-2 border border-line px-3 py-2.5 text-[0.9rem]">
+                <div className="flex items-center gap-2.5">
+                  <input
+                    type="color"
+                    value={r.color || BRAND_RED}
+                    onChange={(e) => handleRoleColorChange(r.id, e.target.value)}
+                    disabled={!!r.discord_role_id}
+                    title={
+                      r.discord_role_id
+                        ? 'A cor vem do Discord. Desvincule pra editar na mão.'
+                        : `Cor do cargo ${r.name}`
+                    }
+                    aria-label={`Cor do cargo ${r.name}`}
+                    className="w-7 h-7 shrink-0 cursor-pointer bg-transparent border border-line p-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                  />
+                  <span className="flex-1 font-semibold" style={{ color: r.color || BRAND_RED }}>
+                    {r.name}
+                  </span>
+                  <span className="text-ink-dim text-[0.78rem]">ordem {r.sort_order}</span>
+                  <button
+                    type="button"
+                    title="Excluir cargo"
+                    onClick={() => handleDeleteRole(r.id)}
+                    className="bg-none border-none text-ink-dim hover:text-brand cursor-pointer text-[1.1rem] leading-none px-1.5 py-0.5"
+                  >
+                    ×
+                  </button>
+                </div>
+                {discordRoles && (
+                  <label className="mt-2 flex items-center gap-2 text-[0.78rem] text-ink-dim">
+                    <span className="shrink-0">Cor do Discord:</span>
+                    <select
+                      value={r.discord_role_id || ''}
+                      onChange={(e) => handleDiscordLink(r.id, e.target.value)}
+                      className={cn(selectClass, 'flex-1 min-w-0 text-[0.78rem] py-1')}
+                    >
+                      <option value="">— definir na mão —</option>
+                      {discordRoles.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.name}
+                          {d.color ? ` (${d.color})` : ' (sem cor)'}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
               </div>
             ))}
           </div>
+
+          <div className="mb-3.5 text-[0.78rem]">
+            {discordLoading && <span className="text-ink-dim">Lendo os cargos do Discord…</span>}
+            {discordError && (
+              <span className="text-brand">Discord indisponível: {discordError}</span>
+            )}
+            {discordRoles && (
+              <button
+                type="button"
+                onClick={handleSyncDiscordColors}
+                className="bg-none border border-line text-ink-dim hover:text-brand hover:border-brand transition-colors cursor-pointer px-2.5 py-1.5 tracking-wide"
+              >
+                Sincronizar cores do Discord
+              </button>
+            )}
+          </div>
+
           <form className="flex gap-2 flex-wrap" onSubmit={handleAddRole}>
             <input
               type="color"
