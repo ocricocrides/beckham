@@ -8,8 +8,8 @@ export function MemberCard({ profile, onClick }: { profile: MemberProfileWithRol
       className="border-transparent hover:border-transparent bg-panel rounded-md shadow-[0_1rem_2rem_-1rem_black] transition-colors hover:bg-panel-2 cursor-pointer overflow-hidden"
       onClick={onClick}
     >
-      <span className="pointer-events-none absolute -top-px -right-px w-1/2 h-1/2 rounded-tr-md border-t-2 border-r-2 border-line transition-colors duration-300 group-hover:border-brand" />
-      <span className="pointer-events-none absolute -bottom-px -left-px w-1/2 h-1/2 rounded-bl-md border-b-2 border-l-2 border-line transition-colors duration-300 group-hover:border-brand" />
+      <span className="pointer-events-none absolute -top-px -right-px w-1/2 h-1/2 rounded-tr-md border-t-2 border-r-2 border-line transition-colors duration-300 group-hover:border-brand transform-gpu" />
+      <span className="pointer-events-none absolute -bottom-px -left-px w-1/2 h-1/2 rounded-bl-md border-b-2 border-l-2 border-line transition-colors duration-300 group-hover:border-brand transform-gpu" />
 
       <div className="p-[26px_22px]">
         <div className="relative w-[52px] h-[52px] mb-4 rounded-full ring-2 ring-transparent transition-all duration-300 group-hover:ring-brand overflow-hidden">

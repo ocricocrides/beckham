@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FormField, inputClass, fileInputClass } from '@/components/layout/FormField';
+import { FormField, FileInput, inputClass } from '@/components/layout/FormField';
+import { CornerFrame } from '@/components/layout/CornerFrame';
 import { Btn } from '@/components/layout/Btn';
 import { BiolinkCard } from '@/components/profile/BiolinkCard';
 import { cn } from '@/lib/utils';
@@ -34,7 +34,6 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
   const [youtube, setYoutube] = useState('');
   const [twitch, setTwitch] = useState('');
   const [discord, setDiscord] = useState('');
-  const [shareImage, setShareImage] = useState<'avatar' | 'banner'>('avatar');
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -49,6 +48,8 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
 
   const [linkStatus, setLinkStatus] = useState<{ text: string; code?: string } | null>(null);
   const generatingRef = useRef(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open || !profile) return;
@@ -61,7 +62,6 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     setYoutube(profile.youtube_url || '');
     setTwitch(profile.twitch_url || '');
     setDiscord(profile.discord_url || '');
-    setShareImage((profile.share_image as 'avatar' | 'banner') || 'avatar');
     setAvatarFile(null);
     setAvatarPreview(null);
     setAvatarRemoved(false);
@@ -133,12 +133,14 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
   }
 
   function handleRemoveAvatar() {
+    if (avatarInputRef.current) avatarInputRef.current.value = '';
     setAvatarFile(null);
     setAvatarPreview(null);
     setAvatarRemoved(true);
   }
 
   function handleRemoveBanner() {
+    if (bannerInputRef.current) bannerInputRef.current.value = '';
     setBannerFile(null);
     setBannerPreview(null);
     setBannerRemoved(true);
@@ -174,12 +176,13 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
         youtube_url: youtube.trim(),
         twitch_url: twitch.trim(),
         discord_url: discord.trim(),
-        share_image: shareImage,
         avatar_url,
         banner_url,
       };
       const { error } = await supabase.from('member_profiles').upsert(payload);
       if (error) throw error;
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+      if (bannerInputRef.current) bannerInputRef.current.value = '';
       setAvatarFile(null);
       setAvatarPreview(null);
       setAvatarRemoved(false);
@@ -216,7 +219,6 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
       youtube_url: youtube.trim() || null,
       twitch_url: twitch.trim() || null,
       discord_url: discord.trim() || null,
-      share_image: shareImage,
       avatar_url: avatarPreview || (avatarRemoved ? null : profile.avatar_url),
       banner_url: bannerPreview || (bannerRemoved ? null : profile.banner_url),
     };
@@ -232,7 +234,6 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     youtube,
     twitch,
     discord,
-    shareImage,
     avatarPreview,
     avatarRemoved,
     bannerPreview,
@@ -241,7 +242,10 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-panel border border-line rounded-none clip-corner-panel p-9 max-w-[1040px] max-h-[88vh] overflow-y-auto text-ink [&>button]:text-ink-dim [&>button]:opacity-100 [&>button:hover]:text-brand">
+      <DialogContent className="bg-panel border border-transparent rounded-none p-0 max-w-[1040px] max-h-[88vh] flex flex-col overflow-hidden text-ink [&>button]:text-ink-dim [&>button]:opacity-100 [&>button:hover]:text-brand">
+        <span className="pointer-events-none absolute -top-px -right-px w-8 h-8 border-t-2 border-r-2 border-line transform-gpu" />
+        <span className="pointer-events-none absolute -bottom-px -left-px w-8 h-8 border-b-2 border-l-2 border-line transform-gpu" />
+        <div className="min-h-0 flex-1 overflow-y-auto p-9">
         <h3 className="text-[1.4rem] mb-5 text-ink">Meu Perfil</h3>
         <div className="grid lg:grid-cols-[1fr_400px] gap-8 items-start">
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
@@ -256,15 +260,17 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
           </FormField>
 
           <FormField label="Avatar (imagem)" htmlFor="pfAvatarFile">
-            <Input id="pfAvatarFile" type="file" accept="image/*" className={fileInputClass} onChange={onAvatarChange} />
+            <FileInput id="pfAvatarFile" accept="image/*" inputRef={avatarInputRef} fileName={avatarFile?.name} onChange={onAvatarChange} />
           </FormField>
           {(avatarPreview || (!avatarRemoved && profile?.avatar_url)) && (
             <div className="flex items-center gap-3 -mt-2">
-              <img
-                src={avatarPreview || profile?.avatar_url || ''}
-                alt="Prévia do avatar"
-                className="w-24 h-24 object-cover border border-line"
-              />
+              <CornerFrame>
+                <img
+                  src={avatarPreview || profile?.avatar_url || ''}
+                  alt="Prévia do avatar"
+                  className="w-24 h-24 object-cover"
+                />
+              </CornerFrame>
               <Btn type="button" variant="outline" onClick={handleRemoveAvatar}>
                 Remover avatar
               </Btn>
@@ -273,33 +279,23 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
           {avatarRemoved && <p className="text-ink-dim text-[0.8rem] -mt-2">Avatar padrão será usado ao salvar.</p>}
 
           <FormField label="Banner (imagem)" htmlFor="pfBannerFile">
-            <Input id="pfBannerFile" type="file" accept="image/*" className={fileInputClass} onChange={onBannerChange} />
+            <FileInput id="pfBannerFile" accept="image/*" inputRef={bannerInputRef} fileName={bannerFile?.name} onChange={onBannerChange} />
           </FormField>
           {(bannerPreview || (!bannerRemoved && profile?.banner_url)) && (
             <div className="flex flex-col gap-2 -mt-2">
-              <img
-                src={bannerPreview || profile?.banner_url || ''}
-                alt="Prévia do banner"
-                className="w-full h-20 object-cover border border-line"
-              />
+              <CornerFrame>
+                <img
+                  src={bannerPreview || profile?.banner_url || ''}
+                  alt="Prévia do banner"
+                  className="w-full h-20 object-cover"
+                />
+              </CornerFrame>
               <Btn type="button" variant="outline" onClick={handleRemoveBanner} className="self-start">
                 Remover banner
               </Btn>
             </div>
           )}
           {bannerRemoved && <p className="text-ink-dim text-[0.8rem] -mt-2">Banner padrão será usado ao salvar.</p>}
-
-          <FormField label="Imagem ao compartilhar o link do perfil (Discord, WhatsApp etc.)" htmlFor="pfShareImage">
-            <Select value={shareImage} onValueChange={(v) => setShareImage(v as 'avatar' | 'banner')}>
-              <SelectTrigger id="pfShareImage" className={cn(inputClass, 'w-full')}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-panel-2 border border-line text-ink rounded-none">
-                <SelectItem value="avatar">Avatar</SelectItem>
-                <SelectItem value="banner">Banner</SelectItem>
-              </SelectContent>
-            </Select>
-          </FormField>
 
           <FormField label="Música de fundo (link do YouTube, Spotify ou .mp3 direto)" htmlFor="pfMusic">
             <Input
@@ -362,6 +358,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
         <div className="lg:sticky lg:top-0">
           <p className="text-ink-dim text-[0.75rem] tracking-wide uppercase mb-3">Pré-visualização</p>
           {previewProfile && <BiolinkCard profile={previewProfile} />}
+        </div>
         </div>
         </div>
       </DialogContent>

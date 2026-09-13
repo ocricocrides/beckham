@@ -28,7 +28,9 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     <ConfirmContext.Provider value={{ confirm }}>
       {children}
       <Dialog open={message !== null} onOpenChange={(open) => !open && close(false)}>
-        <DialogContent className="bg-panel border border-line rounded-none clip-corner-panel p-9 max-w-[380px] text-ink">
+        <DialogContent className="bg-panel border border-transparent rounded-none p-9 max-w-[380px] text-ink">
+          <span className="pointer-events-none absolute -top-px -right-px w-6 h-6 border-t-2 border-r-2 border-line transform-gpu" />
+          <span className="pointer-events-none absolute -bottom-px -left-px w-6 h-6 border-b-2 border-l-2 border-line transform-gpu" />
           <p className="text-ink-dim text-[0.95rem] leading-relaxed">{message}</p>
           <div className="flex justify-end gap-3 mt-6">
             <Btn variant="outline" onClick={() => close(false)}>

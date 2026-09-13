@@ -74,11 +74,6 @@
   .clip-corner-avatar {
     clip-path: polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%);
   }
-  /* recorte assimétrico usado nos modais */
-  .clip-corner-panel {
-    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
-  }
-
   .skeleton {
     background: linear-gradient(90deg, theme('colors.panel') 25%, theme('colors.panel-2') 50%, theme('colors.panel') 75%);
     background-size: 200% 100%;

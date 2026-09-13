@@ -84,7 +84,9 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-panel border border-line rounded-none clip-corner-panel p-9 pt-9 max-w-[420px] text-ink [&>button]:text-ink-dim [&>button]:opacity-100 [&>button:hover]:text-brand [&>button]:top-3.5 [&>button]:right-4.5">
+      <DialogContent className="bg-panel border border-transparent rounded-none p-9 pt-9 max-w-[420px] text-ink [&>button]:text-ink-dim [&>button]:opacity-100 [&>button:hover]:text-brand [&>button]:top-3.5 [&>button]:right-4.5">
+        <span className="pointer-events-none absolute -top-px -right-px w-8 h-8 border-t-2 border-r-2 border-line transform-gpu" />
+        <span className="pointer-events-none absolute -bottom-px -left-px w-8 h-8 border-b-2 border-l-2 border-line transform-gpu" />
         <div className="flex gap-2 mb-5">
           <button
             type="button"
