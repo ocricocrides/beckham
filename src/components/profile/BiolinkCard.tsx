@@ -36,9 +36,7 @@ export function BiolinkCard({ profile }: { profile: MemberProfileWithRole }) {
     <GlowCard className="bg-panel overflow-hidden">
       <div
         className="relative z-[1] h-[150px] bg-[#0b0b0c] bg-cover bg-center [filter:saturate(1.1)]"
-        style={{
-          backgroundImage: `${profile.banner_url ? `url('${bannerSrc}')` : `linear-gradient(135deg, #7a0012, #0b0b0c 70%)`}`,
-        }}
+        style={{ backgroundImage: `url('${bannerSrc}')` }}
       />
       <div className="px-7 pb-8 text-center">
         <div
