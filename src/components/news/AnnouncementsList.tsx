@@ -1,14 +1,18 @@
+import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useAnnouncements } from '@/hooks/useAnnouncements';
 import { useConfirm } from '@/hooks/useConfirm';
 import { supabase } from '@/lib/supabase';
+import { Btn } from '@/components/layout/Btn';
+import { CreateAnnouncementModal } from './CreateAnnouncementModal';
 
 export function AnnouncementsList() {
   const { profile } = useAuth();
   const { announcements, loading, reload } = useAnnouncements();
   const confirm = useConfirm();
   const isAdmin = !!profile?.is_admin;
+  const [createOpen, setCreateOpen] = useState(false);
 
   async function handleDelete(id: string) {
     if (!(await confirm('Excluir esse anúncio?'))) return;
@@ -17,9 +21,19 @@ export function AnnouncementsList() {
     else reload();
   }
 
+  const createButton = isAdmin && (
+    <div className="mt-8 flex justify-end">
+      <Btn type="button" variant="primary" onClick={() => setCreateOpen(true)}>
+        + Novo anúncio
+      </Btn>
+      <CreateAnnouncementModal open={createOpen} onOpenChange={setCreateOpen} onCreated={reload} />
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="mt-8 flex flex-col gap-[18px] pb-20">
+      <div className="flex flex-col gap-[18px] pb-20">
+        {createButton}
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="skeleton h-[52px]" />
         ))}
@@ -28,11 +42,17 @@ export function AnnouncementsList() {
   }
 
   if (!announcements?.length) {
-    return <p className="mt-8 text-ink-dim text-[0.85rem]">Nenhum anúncio publicado ainda.</p>;
+    return (
+      <div className="pb-20">
+        {createButton}
+        <p className="mt-8 text-ink-dim text-[0.85rem]">Nenhum anúncio publicado ainda.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="mt-8 flex flex-col gap-[18px] pb-20">
+    <div className="flex flex-col gap-[18px] pb-20">
+      {createButton}
       {announcements.map((a) => (
         <div key={a.id} className="relative bg-panel border border-line p-6">
           {isAdmin && (

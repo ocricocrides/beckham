@@ -4,6 +4,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useGallery } from '@/hooks/useGallery';
 import { useConfirm } from '@/hooks/useConfirm';
 import { supabase } from '@/lib/supabase';
+import { Btn } from '@/components/layout/Btn';
+import { AddPhotoModal } from './AddPhotoModal';
 import { PhotoLightbox } from './PhotoLightbox';
 import type { CrewPhoto } from '@/hooks/useGallery';
 
@@ -12,6 +14,7 @@ export function GalleryGrid() {
   const { photos, loading, reload } = useGallery();
   const confirm = useConfirm();
   const [active, setActive] = useState<CrewPhoto | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
   const isAdmin = !!profile?.is_admin;
 
   async function handleDelete(id: string) {
@@ -21,22 +24,40 @@ export function GalleryGrid() {
     else reload();
   }
 
+  const addButton = isAdmin && (
+    <div className="mt-8 flex justify-end">
+      <Btn type="button" variant="primary" onClick={() => setAddOpen(true)}>
+        + Adicionar foto
+      </Btn>
+      <AddPhotoModal open={addOpen} onOpenChange={setAddOpen} onCreated={reload} />
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="mt-8 grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-[18px] pb-20">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="skeleton aspect-[4/3]" />
-        ))}
+      <div className="pb-20">
+        {addButton}
+        <div className="mt-8 grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-[18px]">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="skeleton aspect-[4/3]" />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (!photos?.length) {
-    return <p className="mt-8 text-ink-dim text-[0.85rem]">Nenhuma foto publicada ainda.</p>;
+    return (
+      <div className="pb-20">
+        {addButton}
+        <p className="mt-8 text-ink-dim text-[0.85rem]">Nenhuma foto publicada ainda.</p>
+      </div>
+    );
   }
 
   return (
     <>
+      {addButton}
       <div className="mt-8 grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-[18px] pb-20">
         {photos.map((p) => (
           <div
