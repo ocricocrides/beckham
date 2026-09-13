@@ -1,5 +1,11 @@
-import { ComingSoon } from '@/components/layout/ComingSoon';
+import { Wrap, SectionHead } from '@/components/layout/Wrap';
+import { GalleryGrid } from '@/components/gallery/GalleryGrid';
 
 export default function FotosPage() {
-  return <ComingSoon title="Fotos" description="Galeria alimentada pelo bot do Discord chega na Etapa 4." />;
+  return (
+    <Wrap>
+      <SectionHead title="Fotos" description="Registros da organização em eventos, reuniões e atividades oficiais." />
+      <GalleryGrid />
+    </Wrap>
+  );
 }

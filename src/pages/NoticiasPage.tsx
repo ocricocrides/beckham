@@ -1,5 +1,11 @@
-import { ComingSoon } from '@/components/layout/ComingSoon';
+import { Wrap, SectionHead } from '@/components/layout/Wrap';
+import { AnnouncementsList } from '@/components/news/AnnouncementsList';
 
 export default function NoticiasPage() {
-  return <ComingSoon title="Notícias" description="Anúncios do bot do Discord chegam na Etapa 4." />;
+  return (
+    <Wrap>
+      <SectionHead title="Notícias" description="Anúncios oficiais da organização, publicados direto do Discord." />
+      <AnnouncementsList />
+    </Wrap>
+  );
 }
