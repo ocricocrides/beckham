@@ -10,6 +10,9 @@ import { useConfirm } from '@/hooks/useConfirm';
 
 const selectClass = 'font-body bg-panel border border-line text-ink px-2.5 py-1.5 text-[0.85rem]';
 
+/** Mesmo vermelho do tema (tailwind.config.ts). Cargo sem cor definida cai nele. */
+const BRAND_RED = '#ff1633';
+
 export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const { user, refreshProfile } = useAuth();
   const { roles, reload: reloadRoles } = useRoles();
@@ -18,13 +21,16 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
 
   const [roleName, setRoleName] = useState('');
   const [roleOrder, setRoleOrder] = useState('');
+  const [roleColor, setRoleColor] = useState(BRAND_RED);
   const [msg, setMsg] = useState('');
   const [msgKind, setMsgKind] = useState<'' | 'error' | 'success'>('');
 
   async function handleAddRole(e: FormEvent) {
     e.preventDefault();
     const order = parseInt(roleOrder, 10);
-    const { error } = await supabase.from('roles').insert({ name: roleName.trim(), sort_order: order });
+    const { error } = await supabase
+      .from('roles')
+      .insert({ name: roleName.trim(), sort_order: order, color: roleColor });
     if (error) {
       setMsgKind('error');
       setMsg('Erro: ' + error.message);
@@ -32,8 +38,22 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
     }
     setRoleName('');
     setRoleOrder('');
+    setRoleColor(BRAND_RED);
     setMsgKind('success');
     setMsg('Cargo criado.');
+    reloadRoles();
+    reloadProfiles();
+  }
+
+  async function handleRoleColorChange(id: string, color: string) {
+    const { error } = await supabase.from('roles').update({ color }).eq('id', id);
+    if (error) {
+      setMsgKind('error');
+      setMsg('Erro: ' + error.message);
+      return;
+    }
+    setMsgKind('success');
+    setMsg('Cor do cargo atualizada.');
     reloadRoles();
     reloadProfiles();
   }
@@ -88,7 +108,20 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
             {roles.length === 0 && <p className="text-ink-dim text-[0.85rem]">Nenhum cargo criado ainda.</p>}
             {roles.map((r) => (
               <div key={r.id} className="flex items-center gap-2.5 bg-panel-2 border border-line px-3 py-2.5 text-[0.9rem]">
-                <span className="flex-1 text-ink font-semibold">{r.name}</span>
+                <input
+                  type="color"
+                  value={r.color || BRAND_RED}
+                  onChange={(e) => handleRoleColorChange(r.id, e.target.value)}
+                  title={`Cor do cargo ${r.name}`}
+                  aria-label={`Cor do cargo ${r.name}`}
+                  className="w-7 h-7 shrink-0 cursor-pointer bg-transparent border border-line p-0.5"
+                />
+                <span
+                  className="flex-1 font-semibold"
+                  style={{ color: r.color || BRAND_RED }}
+                >
+                  {r.name}
+                </span>
                 <span className="text-ink-dim text-[0.78rem]">ordem {r.sort_order}</span>
                 <button
                   type="button"
@@ -102,6 +135,14 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
             ))}
           </div>
           <form className="flex gap-2 flex-wrap" onSubmit={handleAddRole}>
+            <input
+              type="color"
+              value={roleColor}
+              onChange={(e) => setRoleColor(e.target.value)}
+              title="Cor do cargo"
+              aria-label="Cor do novo cargo"
+              className="w-9 shrink-0 cursor-pointer bg-transparent border border-line p-0.5"
+            />
             <input
               value={roleName}
               onChange={(e) => setRoleName(e.target.value)}

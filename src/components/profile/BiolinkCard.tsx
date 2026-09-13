@@ -45,7 +45,12 @@ export function BiolinkCard({ profile }: { profile: MemberProfileWithRole }) {
         />
         <h2 className="text-[1.5rem] text-ink">{profile.display_name || profile.username}</h2>
         {profile.roles && (
-          <div className="text-brand font-bold text-[0.8rem] tracking-wide mt-1.5">{profile.roles.name.toUpperCase()}</div>
+          <div
+            className="text-brand font-bold text-[0.8rem] tracking-wide mt-1.5"
+            style={profile.roles.color ? { color: profile.roles.color } : undefined}
+          >
+            {profile.roles.name.toUpperCase()}
+          </div>
         )}
         {profile.location && <div className="text-ink-dim text-[0.85rem] mt-2">📍 {profile.location}</div>}
         {profile.bio && <p className="text-ink-dim text-[0.95rem] leading-[1.6] mt-[18px]">{profile.bio}</p>}

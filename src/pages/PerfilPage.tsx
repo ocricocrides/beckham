@@ -26,7 +26,7 @@ export default function PerfilPage() {
     setProfile(undefined);
     supabase
       .from('member_profiles')
-      .select('*, roles(id, name, sort_order)')
+      .select('*, roles(id, name, sort_order, color, discord_role_id)')
       .eq('username', username)
       .maybeSingle()
       .then(({ data }) => {

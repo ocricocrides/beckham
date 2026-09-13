@@ -257,9 +257,30 @@ export type Database = {
         Relationships: [];
       };
       roles: {
-        Row: { created_at: string; id: string; name: string; sort_order: number };
-        Insert: { created_at?: string; id?: string; name: string; sort_order?: number };
-        Update: { created_at?: string; id?: string; name?: string; sort_order?: number };
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          sort_order: number;
+          color: string | null;
+          discord_role_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          sort_order?: number;
+          color?: string | null;
+          discord_role_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          sort_order?: number;
+          color?: string | null;
+          discord_role_id?: string | null;
+        };
         Relationships: [];
       };
     };

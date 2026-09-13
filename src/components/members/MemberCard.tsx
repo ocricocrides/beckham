@@ -23,7 +23,12 @@ export function MemberCard({ profile, onClick }: { profile: MemberProfileWithRol
         </div>
         <h4 className="text-ink text-[1.05rem] font-semibold">{profile.display_name || profile.username}</h4>
         {profile.roles && (
-          <div className="text-brand text-[0.78rem] font-bold tracking-wide my-1.5">{profile.roles.name.toUpperCase()}</div>
+          <div
+            className="text-brand text-[0.78rem] font-bold tracking-wide my-1.5"
+            style={profile.roles.color ? { color: profile.roles.color } : undefined}
+          >
+            {profile.roles.name.toUpperCase()}
+          </div>
         )}
         <p className="text-ink-dim text-[0.88rem] leading-[1.5]">{profile.bio}</p>
       </div>

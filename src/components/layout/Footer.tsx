@@ -25,7 +25,7 @@ export function Footer() {
       ref={footerRef}
       className="fixed left-0 right-0 bottom-0 z-50 border-t border-line px-[5vw] py-4 text-ink-dim text-[0.8rem] bg-gradient-to-t from-void/95 to-void/85 backdrop-blur-md"
     >
-      <div className="flex justify-between items-center gap-x-5 gap-y-1.5 flex-wrap">
+      <div className="flex justify-center items-center gap-x-5 gap-y-1.5 flex-wrap text-center">
         <div className="logo flex items-center gap-2.5 text-[0.95rem]">
           <picture>
             <source srcSet="/assets/logo.webp" type="image/webp" />
@@ -47,7 +47,7 @@ export function Footer() {
         >
           Suporte e contato: Discord
         </a>
-        <div className="max-[760px]:w-full max-[760px]:text-center max-[760px]:text-[0.72rem]">
+        <div className="max-[760px]:w-full max-[760px]:text-[0.72rem]">
           © 2026 BECKHAM — A comunidade é real. O que acontece no jogo é roleplay.
         </div>
       </div>

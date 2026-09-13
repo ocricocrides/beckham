@@ -6,7 +6,7 @@ import { useRealtimeTable } from '@/context/RealtimeContext';
 async function fetchAllProfiles(): Promise<MemberProfileWithRole[]> {
   const { data, error } = await supabase
     .from('member_profiles')
-    .select('*, roles(id, name, sort_order)')
+    .select('*, roles(id, name, sort_order, color, discord_role_id)')
     .order('created_at', { ascending: true });
   if (error || !data) return [];
   return (data as MemberProfileWithRole[]).sort((a, b) => {
