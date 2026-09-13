@@ -27,20 +27,20 @@ export default function InicioPage() {
         </picture>
 
         <p className="max-w-[520px] mt-[18px] text-[1.15rem] text-ink-dim leading-[1.6]">
-          Construída na base do compromisso e do respeito mútuo. Aqui dentro, cada membro tem um papel.
+          Nascida em 2018 de um grupo que competia em campeonatos no FiveM, hoje é uma facção ativa no Lado Leste.
         </p>
 
         <div className="flex flex-wrap mt-8 border-t border-line">
           <div className="flex-1 basis-1/2 min-[701px]:basis-auto pt-[22px] pr-6 pb-4 min-[701px]:pb-0 border-b min-[701px]:border-b-0 border-line">
-            <div className="text-[2.1rem] font-bold text-brand font-display">2018</div>
+            <div className="text-[2.1rem] leading-[2.4rem] font-bold text-brand font-display">2018</div>
             <div className="text-[0.8rem] text-ink-dim tracking-wide mt-1">FUNDAÇÃO</div>
           </div>
           <div className="flex-1 basis-1/2 min-[701px]:basis-auto pt-[22px] pr-6 pb-4 min-[701px]:pb-0 border-b min-[701px]:border-b-0 border-line">
-            <div className="text-[2.1rem] font-bold text-brand font-display">12</div>
+            <div className="text-[2.1rem] leading-[2.4rem] font-bold text-brand font-display">12</div>
             <div className="text-[0.8rem] text-ink-dim tracking-wide mt-1">MEMBROS ATIVOS</div>
           </div>
           <div className="flex-1 basis-1/2 min-[701px]:basis-auto pt-[22px] pr-0 pb-0">
-            <div className="text-[1.4rem] tracking-wide font-bold text-brand font-display">LADO LESTE</div>
+            <div className="text-[1.4rem] leading-[2.4rem] tracking-wide font-bold text-brand font-display">LADO LESTE</div>
             <div className="text-[0.8rem] text-ink-dim tracking-wide mt-1">SERVIDOR ATIVO</div>
           </div>
         </div>

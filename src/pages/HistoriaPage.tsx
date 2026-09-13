@@ -5,22 +5,22 @@ const TIMELINE = [
   {
     year: '2018',
     title: 'Fundação',
-    text: 'Neco Beckham reúne o primeiro núcleo de membros e estabelece a base da organização.',
+    text: 'Bruno "Trovão" Beckham e Neco Beckham fundam a facção após competir juntos em campeonatos no FiveM.',
   },
   {
     year: '2020',
     title: 'Expansão',
-    text: 'A organização cresce, conquista uma sede fixa e passa a ser reconhecida no servidor.',
+    text: 'A facção cresce, conquista sede fixa e passa a ser reconhecida no servidor.',
   },
   {
     year: '2023',
-    title: 'Mudança para o Lado Leste',
-    text: 'A BECKHAM se estabelece no servidor Lado Leste, onde constrói sua sede atual.',
+    title: 'Volta ao Hype',
+    text: 'A facção retorna ao servidor Hype pela segunda vez, decidida a focar 100% no crescimento.',
   },
   {
     year: '2026',
-    title: 'Hoje',
-    text: 'A BECKHAM segue ativa no Lado Leste, expandindo seu quadro de membros com critério e mantendo os valores estabelecidos pelo fundador.',
+    title: 'Mudança para o Lado Leste',
+    text: 'A BECKHAM se muda para o Lado Leste, onde está hoje.',
   },
 ];
 
@@ -28,26 +28,19 @@ export default function HistoriaPage() {
   useDocumentTitle('História');
   return (
     <Wrap>
-      <SectionHead title="História" description="De onde a BECKHAM veio e o que ela representa hoje." />
+      <SectionHead title="História" description="De onde veio a BECKHAM e o que ela significa hoje." />
 
       <p className="mt-8 text-[1.3rem] leading-[1.7] text-ink max-w-[760px] border-l-[3px] border-brand pl-6">
-        A BECKHAM nasceu de uma ideia simples: nenhum membro deveria enfrentar desafios sozinho.
+        A BECKHAM começou em 2018, quando um grupo que já competia em campeonatos no FiveM resolveu virar uma
+        facção fixa.
       </p>
 
       <div className="mt-10 max-w-[760px] text-ink-dim text-[1.05rem] leading-[1.8] [&_p]:mb-5 [&_strong]:text-ink">
         <p>
-          No fim de 2018, um pequeno grupo de colaboradores que já atuava em conjunto em diversas atividades decidiu
-          formalizar essa parceria. <strong>Neco Beckham</strong> reuniu esse grupo e propôs algo mais estruturado do
-          que uma reunião informal: uma organização com nome, identidade e princípios bem definidos.
-        </p>
-        <p>
-          O nome foi dado em homenagem ao próprio fundador — não por vaidade, mas em reconhecimento por ter assumido a
-          liderança quando ninguém mais estava disposto a dar o primeiro passo. Desde então, "fazer parte da BECKHAM"
-          tornou-se sinônimo de contar com uma rede de apoio sólida.
-        </p>
-        <p>
-          Hoje a organização segue um princípio simples: compromisso acima de tudo, estrutura interna bem definida e
-          portas abertas para quem demonstra alinhamento com os valores do grupo.
+          O grupo vinha de campeonatos disputados no FiveM e resolveu parar de ser só uma equipe pra virar uma
+          facção de verdade, com nome e identidade próprios. A ideia partiu dos dois donos,{' '}
+          <strong>Bruno "Trovão" Beckham</strong> e <strong>Neco Beckham</strong>. De lá pra cá, a facção já foi
+          chamada pra vários projetos novos nos servidores por onde passou.
         </p>
       </div>
 
