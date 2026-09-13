@@ -32,20 +32,6 @@ export default {
           from: { opacity: '0', transform: 'translateY(8px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
-        glowDrift1: {
-          '0%': { transform: 'translate(0,0) scale(1)' },
-          '25%': { transform: 'translate(-55vw, 30vh) scale(1.2)' },
-          '50%': { transform: 'translate(-30vw, 70vh) scale(0.85)' },
-          '75%': { transform: 'translate(-65vw, 20vh) scale(1.1)' },
-          '100%': { transform: 'translate(0,0) scale(1)' },
-        },
-        glowDrift2: {
-          '0%': { transform: 'translate(0,0) scale(1)' },
-          '25%': { transform: 'translate(50vw, -35vh) scale(1.15)' },
-          '50%': { transform: 'translate(60vw, -75vh) scale(0.9)' },
-          '75%': { transform: 'translate(30vw, -15vh) scale(1.05)' },
-          '100%': { transform: 'translate(0,0) scale(1)' },
-        },
         skeletonPulse: {
           '0%': { backgroundPosition: '200% 0' },
           '100%': { backgroundPosition: '-200% 0' },
@@ -58,8 +44,6 @@ export default {
       animation: {
         'logo-sway': 'logoSway 5s ease-in-out infinite',
         'fade-in': 'fadeIn .5s ease',
-        'glow-drift-1': 'glowDrift1 26s ease-in-out infinite',
-        'glow-drift-2': 'glowDrift2 30s ease-in-out infinite',
         'skeleton-pulse': 'skeletonPulse 1.4s ease-in-out infinite',
         'player-marquee': 'playerMarquee 14s linear infinite',
       },
