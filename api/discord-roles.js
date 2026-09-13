@@ -6,6 +6,14 @@
 // de ambiente da Vercel, e o bot precisa estar dentro do servidor.
 const GUILD_ID = '1065057205201678436';
 
+// Busca os cargos de um servidor. Devolve { ok, status, body }.
+async function fetchRoles(guildId, token) {
+  const r = await fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, {
+    headers: { Authorization: `Bot ${token}` },
+  });
+  return { ok: r.ok, status: r.status, body: r.ok ? await r.json() : await r.text() };
+}
+
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
@@ -18,36 +26,46 @@ export default async function handler(req, res) {
   }
 
   try {
-    const r = await fetch(`https://discord.com/api/v10/guilds/${GUILD_ID}/roles`, {
-      headers: { Authorization: `Bot ${token}` },
-    });
+    let guildId = GUILD_ID;
+    let attempt = await fetchRoles(guildId, token);
 
-    if (!r.ok) {
-      // Erro mais comum aqui: o bot não está no servidor (404) ou o token é inválido (401).
-      // Confirma separadamente se o token em si vale, pra distinguir os dois casos.
-      let botOk = null;
-      try {
-        const me = await fetch('https://discord.com/api/v10/users/@me', {
-          headers: { Authorization: `Bot ${token}` },
-        });
-        botOk = me.ok;
-      } catch {
-        /* ignora: é só diagnóstico */
+    // Se o bot não estiver no servidor configurado, descobre em quais ele está. Quando há só
+    // um, usa esse — evita depender de um id chumbado que pode não bater com o bot real.
+    if (!attempt.ok) {
+      const gr = await fetch('https://discord.com/api/v10/users/@me/guilds', {
+        headers: { Authorization: `Bot ${token}` },
+      });
+      const guilds = gr.ok ? await gr.json() : [];
+      if (guilds.length === 1) {
+        guildId = guilds[0].id;
+        attempt = await fetchRoles(guildId, token);
+      } else if (guilds.length > 1) {
+        res.setHeader('Cache-Control', 'no-store');
+        return res.status(409).send(
+          JSON.stringify({
+            error: 'O bot está em mais de um servidor. Diga qual usar.',
+            guildConfigurado: GUILD_ID,
+            servidoresDoBot: guilds.map((g) => ({ id: g.id, name: g.name })),
+          }),
+        );
       }
-      const body = await r.text();
+    }
+
+    if (!attempt.ok) {
       res.setHeader('Cache-Control', 'no-store');
-      return res.status(r.status).send(
+      return res.status(attempt.status).send(
         JSON.stringify({
           error: 'Não consegui ler os cargos do Discord.',
-          discordStatus: r.status,
-          discordBody: body.slice(0, 300),
-          tokenValido: botOk,
-          guildId: GUILD_ID,
+          discordStatus: attempt.status,
+          discordBody: String(attempt.body).slice(0, 300),
+          tokenValido: true,
+          guildTentado: guildId,
+          dica: 'O bot precisa estar dentro do servidor pra enxergar os cargos.',
         }),
       );
     }
 
-    const roles = await r.json();
+    const roles = attempt.body;
     const limpos = roles
       // @everyone e cargos de integração (bots, boosters) não servem como cargo de membro.
       .filter((role) => role.name !== '@everyone' && !role.managed)
@@ -60,7 +78,7 @@ export default async function handler(req, res) {
         color: role.color ? `#${role.color.toString(16).padStart(6, '0')}` : null,
       }));
 
-    return res.status(200).send(JSON.stringify({ roles: limpos }));
+    return res.status(200).send(JSON.stringify({ guildId, roles: limpos }));
   } catch (e) {
     res.setHeader('Cache-Control', 'no-store');
     return res.status(500).send(JSON.stringify({ error: String(e && e.message) }));
