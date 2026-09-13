@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/perfil/:username", "destination": "/api/perfil/:username" }
+  ]
+}

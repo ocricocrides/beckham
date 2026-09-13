@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Página não encontrada // BECKHAM</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#08090b;
+    --panel:#0f1113;
+    --red:#ff1633;
+    --red-deep:#7a0012;
+    --ink:#f2f1ee;
+    --ink-dim:#9a9a9c;
+    --line: rgba(255,22,51,0.18);
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  body{
+    background:var(--void);
+    color:var(--ink);
+    font-family:'Rajdhani', sans-serif;
+    font-weight:500;
+    overflow-x:hidden;
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    opacity:0.25;
+    pointer-events:none;
+    z-index:0;
+    mask-image: radial-gradient(ellipse at 50% 20%, black 0%, transparent 75%);
+  }
+
+  body::after{
+    content:"";
+    position:fixed; inset:0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.015) 0px,
+      rgba(255,255,255,0.015) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+    pointer-events:none;
+    z-index:1000;
+    mix-blend-mode:overlay;
+  }
+
+  .glow-bg{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; opacity:0.4; }
+  .glow-bg .slab{ position:absolute; filter:blur(40px); opacity:0.35; }
+  .glow-bg .slab1{ width:520px; height:520px; top:-160px; right:-120px; background:linear-gradient(135deg, var(--red-deep), transparent 70%); animation: glowDrift1 26s ease-in-out infinite; }
+  .glow-bg .slab2{ width:360px; height:360px; bottom:-140px; left:-100px; background:radial-gradient(circle, var(--red-deep), transparent 70%); animation: glowDrift2 30s ease-in-out infinite; }
+
+  @keyframes glowDrift1{
+    0%{ transform:translate(0,0) scale(1); }
+    25%{ transform:translate(-55vw, 30vh) scale(1.2); }
+    50%{ transform:translate(-30vw, 70vh) scale(0.85); }
+    75%{ transform:translate(-65vw, 20vh) scale(1.1); }
+    100%{ transform:translate(0,0) scale(1); }
+  }
+  @keyframes glowDrift2{
+    0%{ transform:translate(0,0) scale(1); }
+    25%{ transform:translate(50vw, -35vh) scale(1.15); }
+    50%{ transform:translate(60vw, -75vh) scale(0.9); }
+    75%{ transform:translate(30vw, -15vh) scale(1.05); }
+    100%{ transform:translate(0,0) scale(1); }
+  }
+
+  header{
+    display:flex; align-items:center;
+    padding:20px 5vw;
+    border-bottom:1px solid var(--line);
+    position:relative; z-index:1;
+  }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-img{ height:34px; width:auto; display:block; animation: logoSway 5s ease-in-out infinite; transform-origin:50% 60%; }
+
+  @keyframes logoSway{
+    0%,100%{ transform:rotate(-2deg); }
+    50%{ transform:rotate(2deg); }
+  }
+
+  main{
+    flex:1;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    padding:60px 5vw;
+    position:relative; z-index:1;
+  }
+
+  .eyebrow{
+    color:var(--red);
+    font-family:'Orbitron', sans-serif;
+    font-size:0.85rem;
+    font-weight:700;
+    letter-spacing:3px;
+    margin-bottom:18px;
+  }
+
+  h1{
+    font-family:'Orbitron', sans-serif;
+    font-size:clamp(5rem, 18vw, 11rem);
+    font-weight:900;
+    line-height:0.9;
+    letter-spacing:-2px;
+    -webkit-text-stroke: 2px var(--red);
+    color:transparent;
+  }
+
+  h2{
+    font-family:'Orbitron', sans-serif;
+    font-size:clamp(1.1rem, 3vw, 1.6rem);
+    color:var(--ink);
+    margin-top:14px;
+    letter-spacing:0.5px;
+  }
+
+  p{
+    max-width:480px;
+    margin:18px auto 34px;
+    color:var(--ink-dim);
+    font-size:1.05rem;
+    line-height:1.6;
+  }
+
+  .btn{
+    font-family:'Rajdhani', sans-serif;
+    font-weight:700;
+    letter-spacing:0.5px;
+    font-size:0.95rem;
+    padding:13px 28px;
+    border:1px solid var(--red);
+    background:var(--red);
+    color:#0a0a0a;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-block;
+    clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+    transition:background .2s ease;
+  }
+  .btn:hover{ background:#ff3d55; }
+
+  footer{
+    border-top:1px solid var(--line);
+    padding:26px 5vw;
+    display:flex; justify-content:center; align-items:center;
+    color:var(--ink-dim);
+    font-size:0.8rem;
+    position:relative; z-index:1;
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-bg"><div class="slab slab1"></div><div class="slab slab2"></div></div>
+
+<header>
+  <a class="logo" href="/"><picture><source srcset="/assets/logo.webp" type="image/webp"><img class="logo-img" src="/assets/logo.png" alt="BECKHAM" width="120" height="34" loading="eager"></picture></a>
+</header>
+
+<main>
+  <div class="eyebrow">ERRO 404</div>
+  <h1>404</h1>
+  <h2>Essa página não existe.</h2>
+  <p>O conteúdo que você tentou acessar foi removido, mudou de endereço ou nunca existiu no território da BECKHAM.</p>
+  <a class="btn" href="/">Voltar para o início</a>
+</main>
+
+<footer>
+  <span>© 2026 — Organização fictícia para fins de roleplay em FiveM.</span>
+</footer>
+
+</body>
+</html>
