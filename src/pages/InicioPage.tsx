@@ -7,7 +7,7 @@ import { DISCORD_INVITE } from '@/lib/constants';
 export default function InicioPage() {
   usePageMeta(
     'Início',
-    'Organização de roleplay FiveM fundada em 2018, hoje no Lado Leste. Membros, história, fotos e ranking da BECKHAM.',
+    'Começou como uma família no SA-MP em 2018 e virou organização. Membros, história, fotos e ranking da BECKHAM.',
   );
   const widget = useDiscordWidget();
 
@@ -33,7 +33,7 @@ export default function InicioPage() {
         </picture>
 
         <p className="max-w-[520px] mt-[18px] text-[1.15rem] text-ink-dim leading-[1.6]">
-          Começou nos campeonatos do FiveM em 2018. Hoje tá no Lado Leste.
+          Começou como uma família dentro de um servidor em 2018. Oito anos depois, ainda de pé.
         </p>
 
         {/* O convite fixo sempre aparece — é o único canal de contato. A bolinha de "online" só
