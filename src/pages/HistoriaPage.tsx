@@ -281,6 +281,12 @@ export default function HistoriaPage() {
               </p>
             )}
 
+            {chapter.memorial && (
+              <div className="mt-5 font-display font-bold text-brand text-[0.9rem] tracking-[2px] uppercase">
+                #EternoJordan
+              </div>
+            )}
+
             {i === CHAPTERS.length - 1 && (
               <div className="mt-10 border-t border-line pt-8 text-ink-dim text-[1.05rem] leading-[1.8]">
                 <p className="mb-6">2018 foi apenas o começo. Oito anos depois, a Beckham continua ativa.</p>
