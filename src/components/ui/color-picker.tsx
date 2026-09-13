@@ -133,6 +133,10 @@ function Grade({ valor, onChange }: { valor: string; onChange: (hex: string) => 
   );
 }
 
+/**
+ * Área de matiz (eixo X) por saturação (eixo Y). O brilho acompanha a saturação para que
+ * o canto inferior chegue no escuro sem precisar de um controle separado.
+ */
 function Espectro({
   hsv,
   onChange,
@@ -142,8 +146,6 @@ function Espectro({
 }) {
   const areaRef = useRef<HTMLDivElement>(null);
   const arrastando = useRef(false);
-  const hsvRef = useRef(hsv);
-  hsvRef.current = hsv;
 
   useEffect(() => {
     function mover(e: MouseEvent | TouchEvent) {
@@ -152,7 +154,7 @@ function Espectro({
       const r = areaRef.current.getBoundingClientRect();
       const x = Math.max(0, Math.min(1, (p.clientX - r.left) / r.width));
       const y = Math.max(0, Math.min(1, (p.clientY - r.top) / r.height));
-      onChange({ h: x * 360, s: 100 - y * 100, v: hsvRef.current.v });
+      onChange({ h: x * 360, s: 100, v: 100 - y * 100 });
     }
     function soltar() {
       arrastando.current = false;
@@ -174,39 +176,26 @@ function Espectro({
     const r = e.currentTarget.getBoundingClientRect();
     const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
     const y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
-    onChange({ h: x * 360, s: 100 - y * 100, v: hsv.v });
+    onChange({ h: x * 360, s: 100, v: 100 - y * 100 });
   }
 
   return (
-    <div className="h-[168px] flex flex-col gap-3">
-      <div
-        ref={areaRef}
-        onMouseDown={iniciar}
-        className="relative flex-1 cursor-crosshair border border-line"
+    <div
+      ref={areaRef}
+      onMouseDown={iniciar}
+      className="relative h-[168px] cursor-crosshair border border-line"
+      style={{
+        background: `linear-gradient(to bottom, transparent, #000 100%), linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)`,
+      }}
+    >
+      <span
+        className="absolute w-3.5 h-3.5 -ml-1.5 -mt-1.5 border-2 border-white pointer-events-none"
         style={{
-          background: `linear-gradient(to bottom, transparent, #000 100%), linear-gradient(to top, #fff, transparent), linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)`,
+          left: `${(hsv.h / 360) * 100}%`,
+          top: `${100 - hsv.v}%`,
+          backgroundColor: rgbToHex(hsvToRgb(hsv)),
         }}
-      >
-        <span
-          className="absolute w-3.5 h-3.5 -ml-1.5 -mt-1.5 border-2 border-white pointer-events-none"
-          style={{
-            left: `${(hsv.h / 360) * 100}%`,
-            top: `${100 - hsv.s}%`,
-            backgroundColor: rgbToHex(hsvToRgb(hsv)),
-          }}
-        />
-      </div>
-      <label className="flex items-center gap-2.5 text-[0.7rem] text-ink-dim">
-        <span className="w-10 shrink-0 font-bold tracking-wide uppercase">Brilho</span>
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={Math.round(hsv.v)}
-          onChange={(e) => onChange({ ...hsv, v: Number(e.target.value) })}
-          className="flex-1 accent-brand"
-        />
-      </label>
+      />
     </div>
   );
 }
@@ -335,8 +324,8 @@ export function ColorPicker({
           sideOffset={8}
           align="start"
           collisionPadding={12}
-          // z acima do Dialog do painel ADM, que fica em z-50.
-          className="z-[120] w-[272px] bg-panel border border-line p-3.5 shadow-2xl relative animate-fade-in"
+          // Precisa ficar acima do DialogContent do painel ADM, que é z-[1001].
+          className="z-[1100] w-[272px] bg-panel border border-line p-3.5 shadow-2xl relative animate-fade-in"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <span className="pointer-events-none absolute -top-px -right-px w-4 h-4 border-t-2 border-r-2 border-brand" />
