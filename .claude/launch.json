@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "beckham-site",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["--yes", "live-server", "--port=5500", "--no-browser"],
-      "port": 5500
+      "name": "beckham-vite",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173
     }
   ]
 }
