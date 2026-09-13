@@ -6,11 +6,13 @@
 // discord_role_id preenchido. Nada mais.
 //
 // Variáveis necessárias na Vercel (Production):
-//   DISCORD_BOT_TOKEN          — já configurada
-//   SUPABASE_SERVICE_ROLE_KEY  — Supabase → Project Settings → API → service_role
-//   CRON_SECRET                — opcional, mas recomendada: a Vercel manda ela no header
-//                                Authorization das chamadas de cron, e sem isso o endpoint
-//                                fica aberto pra qualquer um disparar.
+//   DISCORD_BOT_TOKEN     — já configurada
+//   SUPABASE_SECRET_KEY   — Supabase → Project Settings → API Keys → Secret keys → "default"
+//                           (é a sucessora da antiga service_role; o nome velho
+//                           SUPABASE_SERVICE_ROLE_KEY também é aceito, pra retrocompatibilidade)
+//   CRON_SECRET           — opcional, mas recomendada: a Vercel manda ela no header
+//                           Authorization das chamadas de cron, e sem isso o endpoint fica
+//                           aberto pra qualquer um disparar.
 import { fetchGuildRoles } from './_discord.js';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://tywbicthevgfmukemxwg.supabase.co';
@@ -25,10 +27,10 @@ export default async function handler(req, res) {
   }
 
   const token = process.env.DISCORD_BOT_TOKEN;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
   const faltando = [
     !token && 'DISCORD_BOT_TOKEN',
-    !serviceKey && 'SUPABASE_SERVICE_ROLE_KEY',
+    !serviceKey && 'SUPABASE_SECRET_KEY',
   ].filter(Boolean);
   if (faltando.length) {
     return res.status(500).send(
