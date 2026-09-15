@@ -1,29 +1,11 @@
-import { useEffect, useRef } from 'react';
 import { DISCORD_INVITE } from '@/lib/constants';
 
 export function Footer() {
-  const footerRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const el = footerRef.current;
-    if (!el) return;
-    const sync = () => {
-      document.documentElement.style.setProperty('--footer-h', `${el.offsetHeight}px`);
-    };
-    sync();
-    const observer = new ResizeObserver(sync);
-    observer.observe(el);
-    window.addEventListener('resize', sync);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', sync);
-    };
-  }, []);
-
   return (
+    // No fim do documento, em fluxo normal: nao tem conteudo passando por baixo
+    // (fim do vazamento) nem colisao com a barra de URL do Safari no iOS.
     <footer
-      ref={footerRef}
-      className="fixed left-0 right-0 bottom-0 z-50 border-t border-line px-[5vw] py-4 text-ink-dim text-[0.8rem] bg-gradient-to-t from-void/95 to-void/85 backdrop-blur-md"
+      className="relative z-[1] border-t border-line px-[5vw] py-4 text-ink-dim text-[0.8rem] bg-void"
     >
       <div className="flex justify-center items-center gap-x-5 gap-y-1.5 flex-wrap text-center">
         <div className="logo flex items-center gap-2.5 text-[0.95rem]">

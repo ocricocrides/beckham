@@ -12,10 +12,7 @@ export default function InicioPage() {
   const widget = useDiscordWidget();
 
   return (
-    <div
-      className="relative flex flex-col justify-center py-7 pb-8"
-      style={{ minHeight: 'calc(100vh - 78px - var(--footer-h, 90px))' }}
-    >
+    <div className="relative flex-1 flex flex-col justify-center py-7 pb-8">
       <Wrap>
         <div className="text-brand text-[0.85rem] font-bold tracking-[3px] mb-[18px]">BECKHAM — ORGANIZAÇÃO FIVEM</div>
 

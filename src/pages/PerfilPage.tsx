@@ -40,10 +40,7 @@ export default function PerfilPage() {
   const bgImage = profile ? profile.banner_url || profile.avatar_url || DEFAULT_BANNER : null;
 
   return (
-    <div
-      className="flex justify-center"
-      style={{ minHeight: 'calc(100vh - 78px - var(--footer-h, 90px))' }}
-    >
+    <div className="flex-1 flex justify-center">
       {bgImage && (
         <div
           className="fixed inset-0 -z-10 bg-void bg-cover bg-center"

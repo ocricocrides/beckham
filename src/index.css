@@ -3,10 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --footer-h: 90px;
-  }
-
   html {
     scroll-behavior: smooth;
     scrollbar-width: none;
@@ -54,7 +50,9 @@
       transparent 4px
     );
     pointer-events: none;
-    z-index: 1000;
+    /* Abaixo do header (z-100): mix-blend-mode por cima de uma barra grudada no topo
+       faz o Safari iOS nao repintar a regiao no scroll e deixar rastro. */
+    z-index: 2;
     mix-blend-mode: overlay;
   }
 

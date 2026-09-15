@@ -7,7 +7,10 @@ export function Header() {
   const [navOpen, setNavOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-[5vw] py-5 bg-gradient-to-b from-void/95 to-void/70 backdrop-blur-md border-b border-line">
+    // sticky (e nao fixed): ocupa o proprio espaco no fluxo, entao o main nao
+    // precisa mais compensar com padding. Fundo solido porque o conteudo ainda
+    // passa por baixo quando ele gruda no topo.
+    <header className="sticky top-0 z-[100] flex items-center justify-between px-[5vw] py-5 bg-void border-b border-line">
       <div className="logo flex items-center gap-2.5">
         <picture>
           <source srcSet="/assets/logo.webp" type="image/webp" />
