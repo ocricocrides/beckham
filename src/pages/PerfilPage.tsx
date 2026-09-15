@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
-import type { MemberProfileWithRole } from '@/lib/supabase';
+import { MEMBER_ROLES_SELECT, normalizeProfileRoles } from '@/lib/supabase';
+import type { MemberProfileWithRoles } from '@/lib/supabase';
 import { DEFAULT_BANNER } from '@/lib/constants';
 import { Btn } from '@/components/layout/Btn';
 import { BiolinkCard } from '@/components/profile/BiolinkCard';
@@ -10,7 +11,7 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 export default function PerfilPage() {
   const { username } = useParams();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<MemberProfileWithRole | null | undefined>(undefined);
+  const [profile, setProfile] = useState<MemberProfileWithRoles | null | undefined>(undefined);
 
   usePageMeta(
     profile ? profile.display_name || profile.username : username ? `@${username}` : 'Perfil',
@@ -26,11 +27,11 @@ export default function PerfilPage() {
     setProfile(undefined);
     supabase
       .from('member_profiles')
-      .select('*, roles(id, name, sort_order, color, discord_role_id)')
+      .select(MEMBER_ROLES_SELECT)
       .eq('username', username)
       .maybeSingle()
       .then(({ data }) => {
-        if (!cancelled) setProfile((data as MemberProfileWithRole | null) ?? null);
+        if (!cancelled) setProfile(data ? normalizeProfileRoles(data) : null);
       });
     return () => {
       cancelled = true;

@@ -9,7 +9,7 @@ import { BiolinkCard } from '@/components/profile/BiolinkCard';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
-import type { MemberProfileWithRole } from '@/lib/supabase';
+import type { MemberProfileWithRoles } from '@/lib/supabase';
 
 type MsgKind = '' | 'error' | 'success';
 
@@ -205,11 +205,11 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     onOpenChange(false);
   }
 
-  const previewProfile: MemberProfileWithRole | null = useMemo(() => {
+  const previewProfile: MemberProfileWithRoles | null = useMemo(() => {
     if (!profile) return null;
     return {
       ...profile,
-      roles: null,
+      roles: [],
       display_name: displayName.trim() || profile.username,
       location: location.trim() || null,
       bio: bio.trim() || null,

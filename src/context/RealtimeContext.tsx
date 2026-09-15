@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
 
-type TableName = 'member_profiles' | 'roles' | 'crew_photos' | 'announcements' | 'action_ranking';
+type TableName = 'member_profiles' | 'roles' | 'member_roles' | 'crew_photos' | 'announcements' | 'action_ranking';
 type Listener = () => void;
 
 interface RealtimeContextValue {
@@ -14,7 +14,14 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const listenersRef = useRef<Map<TableName, Set<Listener>>>(new Map());
 
   useEffect(() => {
-    const tables: TableName[] = ['member_profiles', 'roles', 'crew_photos', 'announcements', 'action_ranking'];
+    const tables: TableName[] = [
+      'member_profiles',
+      'roles',
+      'member_roles',
+      'crew_photos',
+      'announcements',
+      'action_ranking',
+    ];
     let channel = supabase.channel('site-changes');
     for (const table of tables) {
       channel = channel.on('postgres_changes', { event: '*', schema: 'public', table }, () => {

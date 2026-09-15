@@ -244,6 +244,27 @@ export type Database = {
           },
         ];
       };
+      member_roles: {
+        Row: { created_at: string; member_id: string; role_id: string };
+        Insert: { created_at?: string; member_id: string; role_id: string };
+        Update: { created_at?: string; member_id?: string; role_id?: string };
+        Relationships: [
+          {
+            foreignKeyName: 'member_roles_member_id_fkey';
+            columns: ['member_id'];
+            isOneToOne: false;
+            referencedRelation: 'member_profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'member_roles_role_id_fkey';
+            columns: ['role_id'];
+            isOneToOne: false;
+            referencedRelation: 'roles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       punicoes_ativas: {
         Row: { data: Json; id: string; updated_at: string };
         Insert: { data?: Json; id: string; updated_at?: string };

@@ -1,8 +1,8 @@
-import type { MemberProfileWithRole } from '@/lib/supabase';
+import type { MemberProfileWithRoles } from '@/lib/supabase';
 import { DEFAULT_AVATAR } from '@/lib/constants';
 import { GlowCard } from '@/components/glow-card/GlowCard';
 
-export function MemberCard({ profile, onClick }: { profile: MemberProfileWithRole; onClick: () => void }) {
+export function MemberCard({ profile, onClick }: { profile: MemberProfileWithRoles; onClick: () => void }) {
   return (
     <GlowCard
       className="border-transparent hover:border-transparent bg-panel rounded-md shadow-[0_1rem_2rem_-1rem_black] transition-colors hover:bg-panel-2 cursor-pointer overflow-hidden"
@@ -22,12 +22,17 @@ export function MemberCard({ profile, onClick }: { profile: MemberProfileWithRol
           />
         </div>
         <h4 className="text-ink text-[1.05rem] font-semibold">{profile.display_name || profile.username}</h4>
-        {profile.roles && (
-          <div
-            className="text-brand text-[0.78rem] font-bold tracking-wide my-1.5"
-            style={profile.roles.color ? { color: profile.roles.color } : undefined}
-          >
-            {profile.roles.name.toUpperCase()}
+        {profile.roles.length > 0 && (
+          <div className="flex flex-wrap gap-x-2 gap-y-0.5 my-1.5">
+            {profile.roles.map((r) => (
+              <span
+                key={r.id}
+                className="text-brand text-[0.78rem] font-bold tracking-wide"
+                style={r.color ? { color: r.color } : undefined}
+              >
+                {r.name.toUpperCase()}
+              </span>
+            ))}
           </div>
         )}
         <p className="text-ink-dim text-[0.88rem] leading-[1.5]">{profile.bio}</p>

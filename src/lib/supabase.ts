@@ -17,4 +17,22 @@ export function usernameToEmail(username: string) {
 
 export type MemberProfile = Database['public']['Tables']['member_profiles']['Row'];
 export type Role = Database['public']['Tables']['roles']['Row'];
-export type MemberProfileWithRole = MemberProfile & { roles: Role | null };
+/** Cargos ordenados do mais alto pro mais baixo na hierarquia (menor sort_order primeiro). */
+export type MemberProfileWithRoles = MemberProfile & { roles: Role[] };
+
+/** Select do Supabase pra trazer, junto do perfil, todos os cargos ligados via member_roles. */
+export const MEMBER_ROLES_SELECT = '*, member_roles(roles(*))';
+
+type RawProfileWithMemberRoles = MemberProfile & { member_roles: { roles: Role | null }[] | null };
+
+/** Achata o embed aninhado do Supabase (member_roles -> roles) num array de cargos já ordenado. */
+export function normalizeProfileRoles<T extends RawProfileWithMemberRoles>(
+  row: T,
+): MemberProfileWithRoles {
+  const { member_roles, ...rest } = row;
+  const roles = (member_roles ?? [])
+    .map((mr) => mr.roles)
+    .filter((r): r is Role => r !== null)
+    .sort((a, b) => a.sort_order - b.sort_order);
+  return { ...rest, roles } as MemberProfileWithRoles;
+}

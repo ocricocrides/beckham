@@ -4,9 +4,9 @@ import { SocialIcon, type SocialKind } from './SocialIcon';
 import { MusicEmbed } from './MusicEmbed';
 import { GlowCard } from '@/components/glow-card/GlowCard';
 import { DEFAULT_AVATAR, DEFAULT_BANNER } from '@/lib/constants';
-import type { MemberProfileWithRole } from '@/lib/supabase';
+import type { MemberProfileWithRoles } from '@/lib/supabase';
 
-export function BiolinkCard({ profile }: { profile: MemberProfileWithRole }) {
+export function BiolinkCard({ profile }: { profile: MemberProfileWithRoles }) {
   const [copyLabel, setCopyLabel] = useState('Copiar link do perfil');
   const bannerSrc = profile.banner_url || DEFAULT_BANNER;
   const avatarSrc = profile.avatar_url || DEFAULT_AVATAR;
@@ -44,12 +44,17 @@ export function BiolinkCard({ profile }: { profile: MemberProfileWithRole }) {
           style={{ backgroundImage: `url('${avatarSrc}')` }}
         />
         <h2 className="text-[1.5rem] text-ink">{profile.display_name || profile.username}</h2>
-        {profile.roles && (
-          <div
-            className="text-brand font-bold text-[0.8rem] tracking-wide mt-1.5"
-            style={profile.roles.color ? { color: profile.roles.color } : undefined}
-          >
-            {profile.roles.name.toUpperCase()}
+        {profile.roles.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-x-2 gap-y-0.5 mt-1.5">
+            {profile.roles.map((r) => (
+              <span
+                key={r.id}
+                className="text-brand font-bold text-[0.8rem] tracking-wide"
+                style={r.color ? { color: r.color } : undefined}
+              >
+                {r.name.toUpperCase()}
+              </span>
+            ))}
           </div>
         )}
         {profile.location && <div className="text-ink-dim text-[0.85rem] mt-2">📍 {profile.location}</div>}

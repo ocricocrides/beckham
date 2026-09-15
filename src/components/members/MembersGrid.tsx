@@ -1,8 +1,8 @@
 import { useProfiles } from '@/hooks/useProfiles';
 import { MemberCard } from './MemberCard';
-import type { MemberProfileWithRole } from '@/lib/supabase';
+import type { MemberProfileWithRoles } from '@/lib/supabase';
 
-export function MembersGrid({ onSelect }: { onSelect: (profile: MemberProfileWithRole) => void }) {
+export function MembersGrid({ onSelect }: { onSelect: (profile: MemberProfileWithRoles) => void }) {
   const { profiles, loading } = useProfiles();
 
   return (

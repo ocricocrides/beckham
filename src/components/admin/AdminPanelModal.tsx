@@ -9,6 +9,7 @@ import { useDiscordRoles, type DiscordRole } from '@/hooks/useDiscordRoles';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useConfirm } from '@/hooks/useConfirm';
 import { ColorPicker } from '@/components/ui/color-picker';
+import { RoleMultiSelect } from './RoleMultiSelect';
 
 const selectClass = 'font-body bg-panel border border-line text-ink px-2.5 py-1.5 text-[0.85rem]';
 
@@ -144,26 +145,50 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
   }, [open, discordRoles, roles]);
 
   async function handleDeleteRole(id: string) {
-    if (!(await confirm('Excluir esse cargo? Membros com ele ficam sem cargo.'))) return;
+    if (!(await confirm('Excluir esse cargo? Membros com ele ficam sem esse cargo.'))) return;
+    // Guardado antes de excluir: depois de apagado, member_roles já não sabe quem tinha o quê.
+    const afetados = (profiles ?? []).filter((p) => p.roles.some((r) => r.id === id));
     const { error } = await supabase.from('roles').delete().eq('id', id);
     if (error) {
       setMsgKind('error');
       setMsg('Erro: ' + error.message);
       return;
     }
+    // Recalcula o cargo principal (espelho em role_id) de quem ficou com outros cargos.
+    for (const p of afetados) {
+      const restantes = p.roles.filter((r) => r.id !== id).sort((a, b) => a.sort_order - b.sort_order);
+      await supabase.from('member_profiles').update({ role_id: restantes[0]?.id ?? null }).eq('id', p.id);
+    }
     reloadRoles();
     reloadProfiles();
   }
 
-  async function handleRoleChange(memberId: string, roleId: string) {
-    const { error } = await supabase.from('member_profiles').update({ role_id: roleId || null }).eq('id', memberId);
+  /**
+   * Um membro pode ter vários cargos agora (tabela member_roles). A coluna antiga
+   * member_profiles.role_id continua espelhando o cargo mais alto na hierarquia
+   * (menor sort_order) pra quem ainda lê só ela (ex: o bot do Discord).
+   */
+  async function handleToggleRole(memberId: string, roleId: string, checked: boolean) {
+    const { error } = checked
+      ? await supabase.from('member_roles').insert({ member_id: memberId, role_id: roleId })
+      : await supabase.from('member_roles').delete().eq('member_id', memberId).eq('role_id', roleId);
     if (error) {
       setMsgKind('error');
       setMsg('Erro: ' + error.message);
       return;
     }
+
+    const membro = profiles?.find((p) => p.id === memberId);
+    const idsAtuais = new Set((membro?.roles ?? []).map((r) => r.id));
+    if (checked) idsAtuais.add(roleId);
+    else idsAtuais.delete(roleId);
+    const principal = roles
+      .filter((r) => idsAtuais.has(r.id))
+      .sort((a, b) => a.sort_order - b.sort_order)[0];
+    await supabase.from('member_profiles').update({ role_id: principal?.id ?? null }).eq('id', memberId);
+
     setMsgKind('success');
-    setMsg('Cargo atualizado.');
+    setMsg('Cargos atualizados.');
     reloadProfiles();
   }
 
@@ -297,18 +322,11 @@ export function AdminPanelModal({ open, onOpenChange }: { open: boolean; onOpenC
             {profiles?.map((p) => (
               <div key={p.id} className="flex items-center gap-2.5 flex-wrap bg-panel-2 border border-line px-3 py-2.5 text-[0.85rem]">
                 <span className="flex-1 min-w-[100px] text-ink font-semibold">@{p.username}</span>
-                <select
-                  className={selectClass}
-                  value={p.role_id || ''}
-                  onChange={(e) => handleRoleChange(p.id, e.target.value)}
-                >
-                  <option value="">Sem cargo</option>
-                  {roles.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name}
-                    </option>
-                  ))}
-                </select>
+                <RoleMultiSelect
+                  roles={roles}
+                  selectedIds={new Set(p.roles.map((r) => r.id))}
+                  onToggle={(roleId, checked) => handleToggleRole(p.id, roleId, checked)}
+                />
                 <label className="flex items-center gap-1.5 text-ink-dim text-[0.78rem]">
                   <input
                     type="checkbox"
