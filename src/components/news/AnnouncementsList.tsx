@@ -16,6 +16,13 @@ function quemPostou(a: Announcement) {
   return a.posted_by_display_name || a.posted_by_username || null;
 }
 
+/** Pra mandar no log do Discord: marca (@menção real) quem postou, se a conta tiver Discord vinculado. */
+function quemPostouParaDiscord(a: Announcement) {
+  if (a.posted_by_discord_id) return `<@${a.posted_by_discord_id}>`;
+  const quem = quemPostou(a);
+  return quem ? `@${quem}` : null;
+}
+
 export function AnnouncementsList() {
   const { isAdmin, profile } = useAuth();
   const canPost =
@@ -37,8 +44,8 @@ export function AnnouncementsList() {
     if (error) alert('Erro ao excluir: ' + error.message);
     else {
       reload();
-      const quem = quemPostou(a);
-      const subject = `${a.title} (postado${quem ? ` por @${quem}` : ''} em ${formatDate(a.created_at)})`;
+      const quem = quemPostouParaDiscord(a);
+      const subject = `${a.title} (postado${quem ? ` por ${quem}` : ''} em ${formatDate(a.created_at)})`;
       logDiscordAction('delete_announcement', subject, a.image_url);
     }
   }

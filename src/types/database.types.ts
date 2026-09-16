@@ -164,6 +164,7 @@ export type Database = {
       discord_action_log: {
         Row: {
           action: string
+          actor_discord_id: string | null
           actor_display_name: string | null
           actor_username: string | null
           created_at: string
@@ -174,6 +175,7 @@ export type Database = {
         }
         Insert: {
           action: string
+          actor_discord_id?: string | null
           actor_display_name?: string | null
           actor_username?: string | null
           created_at?: string
@@ -184,6 +186,7 @@ export type Database = {
         }
         Update: {
           action?: string
+          actor_discord_id?: string | null
           actor_display_name?: string | null
           actor_username?: string | null
           created_at?: string

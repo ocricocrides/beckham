@@ -17,6 +17,13 @@ function quemPostou(p: CrewPhoto) {
   return p.posted_by_display_name || p.posted_by_username || null;
 }
 
+/** Pra mandar no log do Discord: marca (@menção real) quem postou, se a conta tiver Discord vinculado. */
+function quemPostouParaDiscord(p: CrewPhoto) {
+  if (p.posted_by_discord_id) return `<@${p.posted_by_discord_id}>`;
+  const quem = quemPostou(p);
+  return quem ? `@${quem}` : null;
+}
+
 export function GalleryGrid() {
   const { isAdmin, profile } = useAuth();
   const canPost = isAdmin || !!profile?.can_post_photos || !!profile?.roles.some((r) => r.can_post_photos);
@@ -37,8 +44,8 @@ export function GalleryGrid() {
     if (error) alert('Erro ao excluir: ' + error.message);
     else {
       reload();
-      const quem = quemPostou(p);
-      const subject = `${p.title} (postada${quem ? ` por @${quem}` : ''} em ${formatDate(p.created_at)})`;
+      const quem = quemPostouParaDiscord(p);
+      const subject = `${p.title} (postada${quem ? ` por ${quem}` : ''} em ${formatDate(p.created_at)})`;
       logDiscordAction('delete_photo', subject, p.image_url);
     }
   }

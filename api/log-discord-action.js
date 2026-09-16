@@ -32,7 +32,7 @@ async function getUserIdFromToken(accessToken) {
 
 async function getActor(userId, serviceKey) {
   const r = await fetch(
-    `${SUPABASE_URL}/rest/v1/member_profiles?id=eq.${userId}&select=username,display_name`,
+    `${SUPABASE_URL}/rest/v1/member_profiles?id=eq.${userId}&select=username,display_name,discord_id`,
     { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } },
   );
   if (!r.ok) return null;
@@ -86,6 +86,7 @@ export default async function handler(req, res) {
         subject: assunto,
         actor_display_name: actor?.display_name || null,
         actor_username: actor?.username || null,
+        actor_discord_id: actor?.discord_id || null,
         image_url: image_url || null,
       }),
     });

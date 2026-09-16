@@ -61,6 +61,7 @@ export function CreateAnnouncementModal({
         image_url,
         posted_by_username: profile?.username || null,
         posted_by_display_name: profile?.display_name || null,
+        posted_by_discord_id: profile?.discord_id || null,
       });
       if (error) throw error;
 
