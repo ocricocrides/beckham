@@ -450,6 +450,7 @@ export type Database = {
           id: string
           is_admin: boolean
           name: string
+          show_on_card: boolean
           sort_order: number
           tipo: string
         }
@@ -464,6 +465,7 @@ export type Database = {
           id?: string
           is_admin?: boolean
           name: string
+          show_on_card?: boolean
           sort_order?: number
           tipo?: string
         }
@@ -478,6 +480,7 @@ export type Database = {
           id?: string
           is_admin?: boolean
           name?: string
+          show_on_card?: boolean
           sort_order?: number
           tipo?: string
         }

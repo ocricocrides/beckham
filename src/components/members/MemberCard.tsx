@@ -3,9 +3,11 @@ import { DEFAULT_AVATAR } from '@/lib/constants';
 import { GlowCard } from '@/components/glow-card/GlowCard';
 
 export function MemberCard({ profile, onClick }: { profile: MemberProfileWithRoles; onClick: () => void }) {
-  // Só o principal aqui — secundários (que podem ser vários) ficam pro perfil completo, senão
-  // o card cresce sem limite e o canto decorativo (tamanho fixo) acaba cortando o texto.
+  // Só o principal + subcargos marcados "aparecer no perfil" aqui — os demais secundários
+  // ficam pro perfil completo, senão o card cresce sem limite e o canto decorativo (tamanho
+  // fixo) acaba cortando o texto.
   const principal = profile.roles.find((r) => r.tipo === 'principal');
+  const secundariosNoCard = profile.roles.filter((r) => r.tipo === 'secundario' && r.show_on_card);
 
   return (
     <GlowCard
@@ -26,12 +28,29 @@ export function MemberCard({ profile, onClick }: { profile: MemberProfileWithRol
           />
         </div>
         <h4 className="text-ink text-[1.05rem] font-semibold">{profile.display_name || profile.username}</h4>
-        {principal && (
-          <div
-            className="text-brand text-[0.78rem] font-bold tracking-wide my-1.5"
-            style={principal.color ? { color: principal.color } : undefined}
-          >
-            {principal.name.toUpperCase()}
+        {(principal || secundariosNoCard.length > 0) && (
+          <div className="my-1.5">
+            {principal && (
+              <div
+                className="text-brand text-[0.78rem] font-bold tracking-wide"
+                style={principal.color ? { color: principal.color } : undefined}
+              >
+                {principal.name.toUpperCase()}
+              </div>
+            )}
+            {secundariosNoCard.length > 0 && (
+              <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
+                {secundariosNoCard.map((r) => (
+                  <span
+                    key={r.id}
+                    className="text-ink-dim text-[0.7rem] font-semibold tracking-wide"
+                    style={r.color ? { color: r.color } : undefined}
+                  >
+                    {r.name.toUpperCase()}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         )}
         <p className="text-ink-dim text-[0.88rem] leading-[1.5]">{profile.bio}</p>

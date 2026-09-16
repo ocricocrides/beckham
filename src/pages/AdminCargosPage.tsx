@@ -22,6 +22,7 @@ type RolePatch = Partial<
     | 'can_post_announcements'
     | 'can_delete_announcements'
     | 'sort_order'
+    | 'show_on_card'
   >
 >;
 
@@ -442,6 +443,17 @@ export default function AdminCargosPage() {
                         />
                         Administrador
                       </label>
+                      {r.tipo === 'secundario' && (
+                        <label className="flex items-center gap-1.5">
+                          <input
+                            type="checkbox"
+                            checked={r.show_on_card}
+                            onChange={(e) => handleRoleUpdate(r.id, { show_on_card: e.target.checked })}
+                            title="Mostra esse subcargo no card do membro, embaixo do cargo principal."
+                          />
+                          Aparecer no perfil
+                        </label>
+                      )}
                     </div>
 
                     <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-[0.78rem] text-ink-dim mb-2">
