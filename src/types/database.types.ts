@@ -300,6 +300,7 @@ export type Database = {
           music_url: string | null
           role_id: string | null
           share_image: string
+          tiktok_url: string | null
           twitch_url: string | null
           updated_at: string
           username: string
@@ -325,6 +326,7 @@ export type Database = {
           music_url?: string | null
           role_id?: string | null
           share_image?: string
+          tiktok_url?: string | null
           twitch_url?: string | null
           updated_at?: string
           username: string
@@ -350,6 +352,7 @@ export type Database = {
           music_url?: string | null
           role_id?: string | null
           share_image?: string
+          tiktok_url?: string | null
           twitch_url?: string | null
           updated_at?: string
           username?: string

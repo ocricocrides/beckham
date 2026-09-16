@@ -17,6 +17,7 @@ export function BiolinkCard({ profile }: { profile: MemberProfileWithRoles }) {
       ['x', profile.x_url],
       ['youtube', profile.youtube_url],
       ['twitch', profile.twitch_url],
+      ['tiktok', profile.tiktok_url],
       ['discord', profile.discord_url],
     ] as [SocialKind, string | null][]
   ).filter((s): s is [SocialKind, string] => Boolean(s[1]));

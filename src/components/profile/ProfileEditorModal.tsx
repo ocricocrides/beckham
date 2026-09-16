@@ -33,6 +33,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
   const [x, setX] = useState('');
   const [youtube, setYoutube] = useState('');
   const [twitch, setTwitch] = useState('');
+  const [tiktok, setTiktok] = useState('');
   const [discord, setDiscord] = useState('');
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -61,6 +62,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     setX(profile.x_url || '');
     setYoutube(profile.youtube_url || '');
     setTwitch(profile.twitch_url || '');
+    setTiktok(profile.tiktok_url || '');
     setDiscord(profile.discord_url || '');
     setAvatarFile(null);
     setAvatarPreview(null);
@@ -175,6 +177,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
         x_url: x.trim(),
         youtube_url: youtube.trim(),
         twitch_url: twitch.trim(),
+        tiktok_url: tiktok.trim(),
         discord_url: discord.trim(),
         avatar_url,
         banner_url,
@@ -218,6 +221,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
       x_url: x.trim() || null,
       youtube_url: youtube.trim() || null,
       twitch_url: twitch.trim() || null,
+      tiktok_url: tiktok.trim() || null,
       discord_url: discord.trim() || null,
       avatar_url: avatarPreview || (avatarRemoved ? null : profile.avatar_url),
       banner_url: bannerPreview || (bannerRemoved ? null : profile.banner_url),
@@ -233,6 +237,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     x,
     youtube,
     twitch,
+    tiktok,
     discord,
     avatarPreview,
     avatarRemoved,
@@ -320,6 +325,9 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
             </FormField>
             <FormField label="Twitch" htmlFor="pfTwitch">
               <Input id="pfTwitch" type="url" placeholder="https://twitch.tv/..." className={inputClass} value={twitch} onChange={(e) => setTwitch(e.target.value)} />
+            </FormField>
+            <FormField label="TikTok" htmlFor="pfTiktok">
+              <Input id="pfTiktok" type="url" placeholder="https://tiktok.com/@..." className={inputClass} value={tiktok} onChange={(e) => setTiktok(e.target.value)} />
             </FormField>
             <FormField label="Discord" htmlFor="pfDiscord">
               <Input id="pfDiscord" type="url" placeholder="https://discord.gg/..." className={inputClass} value={discord} onChange={(e) => setDiscord(e.target.value)} />
