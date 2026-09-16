@@ -9,6 +9,7 @@ import { useDiscordRoles, type DiscordRole } from '@/hooks/useDiscordRoles';
 import { useConfirm } from '@/hooks/useConfirm';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { ColorPicker } from '@/components/ui/color-picker';
+import { Switch } from '@/components/ui/switch';
 import { logDiscordAction } from '@/lib/discordLog';
 import type { Role } from '@/lib/supabase';
 
@@ -267,8 +268,11 @@ export default function AdminCargosPage() {
             <option value="principal">Principal</option>
             <option value="secundario">Secundário</option>
           </select>
-          <label className="flex items-center gap-1.5 text-ink-dim text-[0.85rem]">
-            <input type="checkbox" checked={roleIsAdmin} onChange={(e) => setRoleIsAdmin(e.target.checked)} />
+          <label
+            className="flex items-center gap-2 text-ink-dim text-[0.85rem] cursor-pointer"
+            onClick={() => setRoleIsAdmin((v) => !v)}
+          >
+            <Switch checked={roleIsAdmin} onChange={setRoleIsAdmin} />
             Administrador
           </label>
           <Btn type="submit" variant="primary">
@@ -435,21 +439,25 @@ export default function AdminCargosPage() {
                           <option value="secundario">Secundário</option>
                         </select>
                       </label>
-                      <label className="flex items-center gap-1.5">
-                        <input
-                          type="checkbox"
+                      <label
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => handleRoleUpdate(r.id, { is_admin: !r.is_admin })}
+                      >
+                        <Switch
                           checked={r.is_admin}
-                          onChange={(e) => handleRoleUpdate(r.id, { is_admin: e.target.checked })}
+                          onChange={(checked) => handleRoleUpdate(r.id, { is_admin: checked })}
                         />
                         Administrador
                       </label>
                       {r.tipo === 'secundario' && (
-                        <label className="flex items-center gap-1.5">
-                          <input
-                            type="checkbox"
+                        <label
+                          className="flex items-center gap-2 cursor-pointer"
+                          onClick={() => handleRoleUpdate(r.id, { show_on_card: !r.show_on_card })}
+                          title="Mostra esse subcargo no card do membro, embaixo do cargo principal."
+                        >
+                          <Switch
                             checked={r.show_on_card}
-                            onChange={(e) => handleRoleUpdate(r.id, { show_on_card: e.target.checked })}
-                            title="Mostra esse subcargo no card do membro, embaixo do cargo principal."
+                            onChange={(checked) => handleRoleUpdate(r.id, { show_on_card: checked })}
                           />
                           Aparecer no perfil
                         </label>
@@ -457,35 +465,43 @@ export default function AdminCargosPage() {
                     </div>
 
                     <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-[0.78rem] text-ink-dim mb-2">
-                      <label className="flex items-center gap-1.5">
-                        <input
-                          type="checkbox"
+                      <label
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => handleRoleUpdate(r.id, { can_post_photos: !r.can_post_photos })}
+                      >
+                        <Switch
                           checked={r.can_post_photos}
-                          onChange={(e) => handleRoleUpdate(r.id, { can_post_photos: e.target.checked })}
+                          onChange={(checked) => handleRoleUpdate(r.id, { can_post_photos: checked })}
                         />
                         Postar fotos
                       </label>
-                      <label className="flex items-center gap-1.5">
-                        <input
-                          type="checkbox"
+                      <label
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => handleRoleUpdate(r.id, { can_delete_photos: !r.can_delete_photos })}
+                      >
+                        <Switch
                           checked={r.can_delete_photos}
-                          onChange={(e) => handleRoleUpdate(r.id, { can_delete_photos: e.target.checked })}
+                          onChange={(checked) => handleRoleUpdate(r.id, { can_delete_photos: checked })}
                         />
                         Apagar fotos
                       </label>
-                      <label className="flex items-center gap-1.5">
-                        <input
-                          type="checkbox"
+                      <label
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => handleRoleUpdate(r.id, { can_post_announcements: !r.can_post_announcements })}
+                      >
+                        <Switch
                           checked={r.can_post_announcements}
-                          onChange={(e) => handleRoleUpdate(r.id, { can_post_announcements: e.target.checked })}
+                          onChange={(checked) => handleRoleUpdate(r.id, { can_post_announcements: checked })}
                         />
                         Postar anúncios
                       </label>
-                      <label className="flex items-center gap-1.5">
-                        <input
-                          type="checkbox"
+                      <label
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => handleRoleUpdate(r.id, { can_delete_announcements: !r.can_delete_announcements })}
+                      >
+                        <Switch
                           checked={r.can_delete_announcements}
-                          onChange={(e) => handleRoleUpdate(r.id, { can_delete_announcements: e.target.checked })}
+                          onChange={(checked) => handleRoleUpdate(r.id, { can_delete_announcements: checked })}
                         />
                         Apagar anúncios
                       </label>
