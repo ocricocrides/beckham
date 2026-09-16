@@ -5,10 +5,12 @@ import { CornerFrame } from '@/components/layout/CornerFrame';
 export function FormField({
   label,
   htmlFor,
+  error,
   children,
 }: {
   label: string;
   htmlFor: string;
+  error?: string | null;
   children: ReactNode;
 }) {
   return (
@@ -17,6 +19,7 @@ export function FormField({
         {label}
       </Label>
       <CornerFrame>{children}</CornerFrame>
+      {error && <p className="text-brand text-[0.75rem] -mt-1">{error}</p>}
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import type { MemberProfileWithRoles } from '@/lib/supabase';
+import { getSocialLinkError } from '@/lib/socialLinks';
 
 type MsgKind = '' | 'error' | 'success';
 
@@ -148,9 +149,19 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     setBannerRemoved(true);
   }
 
+  const socialErrors = {
+    instagram: getSocialLinkError('instagram', instagram),
+    x: getSocialLinkError('x', x),
+    youtube: getSocialLinkError('youtube', youtube),
+    twitch: getSocialLinkError('twitch', twitch),
+    tiktok: getSocialLinkError('tiktok', tiktok),
+    discord: getSocialLinkError('discord', discord),
+  };
+  const hasSocialErrors = Object.values(socialErrors).some(Boolean);
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!user || !profile) return;
+    if (!user || !profile || hasSocialErrors) return;
     setSaving(true);
     setMsgKind('');
     setMsg('Salvando...');
@@ -314,22 +325,22 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
           </FormField>
 
           <div className="grid grid-cols-2 gap-3.5 max-[480px]:grid-cols-1">
-            <FormField label="Instagram" htmlFor="pfInstagram">
+            <FormField label="Instagram" htmlFor="pfInstagram" error={socialErrors.instagram}>
               <Input id="pfInstagram" type="url" placeholder="https://instagram.com/..." className={inputClass} value={instagram} onChange={(e) => setInstagram(e.target.value)} />
             </FormField>
-            <FormField label="X / Twitter" htmlFor="pfX">
+            <FormField label="X / Twitter" htmlFor="pfX" error={socialErrors.x}>
               <Input id="pfX" type="url" placeholder="https://x.com/..." className={inputClass} value={x} onChange={(e) => setX(e.target.value)} />
             </FormField>
-            <FormField label="YouTube" htmlFor="pfYoutube">
+            <FormField label="YouTube" htmlFor="pfYoutube" error={socialErrors.youtube}>
               <Input id="pfYoutube" type="url" placeholder="https://youtube.com/..." className={inputClass} value={youtube} onChange={(e) => setYoutube(e.target.value)} />
             </FormField>
-            <FormField label="Twitch" htmlFor="pfTwitch">
+            <FormField label="Twitch" htmlFor="pfTwitch" error={socialErrors.twitch}>
               <Input id="pfTwitch" type="url" placeholder="https://twitch.tv/..." className={inputClass} value={twitch} onChange={(e) => setTwitch(e.target.value)} />
             </FormField>
-            <FormField label="TikTok" htmlFor="pfTiktok">
+            <FormField label="TikTok" htmlFor="pfTiktok" error={socialErrors.tiktok}>
               <Input id="pfTiktok" type="url" placeholder="https://tiktok.com/@..." className={inputClass} value={tiktok} onChange={(e) => setTiktok(e.target.value)} />
             </FormField>
-            <FormField label="Discord" htmlFor="pfDiscord">
+            <FormField label="Discord" htmlFor="pfDiscord" error={socialErrors.discord}>
               <Input id="pfDiscord" type="url" placeholder="https://discord.gg/..." className={inputClass} value={discord} onChange={(e) => setDiscord(e.target.value)} />
             </FormField>
           </div>
@@ -352,7 +363,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
             )}
           </div>
 
-          <Btn type="submit" variant="primary" disabled={saving}>
+          <Btn type="submit" variant="primary" disabled={saving || hasSocialErrors}>
             Salvar perfil
           </Btn>
           <Btn type="button" variant="outline" onClick={handleLogout}>
