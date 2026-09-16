@@ -20,6 +20,7 @@ const ACTIONS = {
   restore_announcement: { label: 'restaurou um anúncio' },
   delete_profile: { label: 'excluiu a conta de' },
   rename_profile: { label: 'renomeou' },
+  rename_role: { label: 'renomeou o cargo' },
 };
 
 async function getUserIdFromToken(accessToken) {

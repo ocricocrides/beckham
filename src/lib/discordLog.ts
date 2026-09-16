@@ -8,7 +8,8 @@ export type LogAction =
   | 'delete_announcement'
   | 'restore_announcement'
   | 'delete_profile'
-  | 'rename_profile';
+  | 'rename_profile'
+  | 'rename_role';
 
 /**
  * Manda um log da ação (quem postou/apagou/restaurou o quê) pro canal do Discord configurado

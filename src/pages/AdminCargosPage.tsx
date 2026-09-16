@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Pencil, Check, X } from 'lucide-react';
 import { Btn } from '@/components/layout/Btn';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -9,6 +9,7 @@ import { useDiscordRoles, type DiscordRole } from '@/hooks/useDiscordRoles';
 import { useConfirm } from '@/hooks/useConfirm';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { ColorPicker } from '@/components/ui/color-picker';
+import { logDiscordAction } from '@/lib/discordLog';
 import type { Role } from '@/lib/supabase';
 
 type RolePatch = Partial<
@@ -53,6 +54,8 @@ export default function AdminCargosPage() {
   const [msg, setMsg] = useState('');
   const [msgKind, setMsgKind] = useState<'' | 'error' | 'success'>('');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
 
   function toggleExpanded(id: string) {
     setExpandedIds((prev) => {
@@ -180,6 +183,37 @@ export default function AdminCargosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [discordRoles, roles]);
 
+  function startRename(r: Role) {
+    setRenamingId(r.id);
+    setRenameValue(r.name);
+  }
+
+  function cancelRename() {
+    setRenamingId(null);
+    setRenameValue('');
+  }
+
+  async function handleRenameRole(id: string) {
+    const novoNome = renameValue.trim();
+    if (!novoNome) return;
+    const nomeAntigo = roles.find((r) => r.id === id)?.name;
+    const { error } = await supabase.from('roles').update({ name: novoNome }).eq('id', id);
+    if (error) {
+      setMsgKind('error');
+      setMsg('Erro: ' + error.message);
+      return;
+    }
+    setMsgKind('success');
+    setMsg('Cargo renomeado.');
+    setRenamingId(null);
+    setRenameValue('');
+    reloadRoles();
+    refreshProfile();
+    if (nomeAntigo && nomeAntigo !== novoNome) {
+      logDiscordAction('rename_role', `${nomeAntigo} → ${novoNome}`);
+    }
+  }
+
   async function handleDeleteRole(id: string) {
     if (!(await confirm('Excluir esse cargo? Membros com ele ficam sem esse cargo.'))) return;
     const { error } = await supabase.from('roles').delete().eq('id', id);
@@ -286,9 +320,68 @@ export default function AdminCargosPage() {
                       aria-label={`Cor do cargo ${r.name}`}
                     />
                   </span>
-                  <span className="flex-1 font-semibold" style={{ color: r.color || BRAND_RED }}>
-                    {r.name}
-                  </span>
+                  {renamingId === r.id ? (
+                    <input
+                      autoFocus
+                      value={renameValue}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleRenameRole(r.id);
+                        }
+                        if (e.key === 'Escape') {
+                          e.preventDefault();
+                          cancelRename();
+                        }
+                      }}
+                      maxLength={30}
+                      className={cn(selectClass, 'flex-1 min-w-0 py-1')}
+                    />
+                  ) : (
+                    <span className="flex-1 font-semibold" style={{ color: r.color || BRAND_RED }}>
+                      {r.name}
+                    </span>
+                  )}
+                  {renamingId === r.id ? (
+                    <>
+                      <button
+                        type="button"
+                        title="Salvar nome"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRenameRole(r.id);
+                        }}
+                        className="bg-none border-none text-ink-dim hover:text-brand cursor-pointer px-1.5 py-0.5"
+                      >
+                        <Check size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        title="Cancelar"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          cancelRename();
+                        }}
+                        className="bg-none border-none text-ink-dim hover:text-brand cursor-pointer px-1.5 py-0.5"
+                      >
+                        <X size={16} />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      title="Renomear cargo"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startRename(r);
+                      }}
+                      className="bg-none border-none text-ink-dim hover:text-brand cursor-pointer px-1.5 py-0.5"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                  )}
                   <button
                     type="button"
                     title="Excluir cargo"
