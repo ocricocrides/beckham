@@ -5,11 +5,17 @@ import { useGallery, useGalleryTrash } from '@/hooks/useGallery';
 import { useConfirm } from '@/hooks/useConfirm';
 import { supabase } from '@/lib/supabase';
 import { logDiscordAction } from '@/lib/discordLog';
+import { formatDate } from '@/lib/utils';
 import { Btn } from '@/components/layout/Btn';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { AddPhotoModal } from './AddPhotoModal';
 import { PhotoLightbox } from './PhotoLightbox';
 import type { CrewPhoto } from '@/hooks/useGallery';
+
+/** "@fulano" de quem postou, ou null se a foto for de antes dessa informação existir. */
+function quemPostou(p: CrewPhoto) {
+  return p.posted_by_display_name || p.posted_by_username || null;
+}
 
 export function GalleryGrid() {
   const { isAdmin, profile } = useAuth();
@@ -31,7 +37,9 @@ export function GalleryGrid() {
     if (error) alert('Erro ao excluir: ' + error.message);
     else {
       reload();
-      logDiscordAction('delete_photo', p.title, p.image_url);
+      const quem = quemPostou(p);
+      const subject = `${p.title} (postada${quem ? ` por @${quem}` : ''} em ${formatDate(p.created_at)})`;
+      logDiscordAction('delete_photo', subject, p.image_url);
     }
   }
 
@@ -103,6 +111,10 @@ export function GalleryGrid() {
               {p.subtitle && (
                 <span className="block text-[0.65rem] text-brand font-bold tracking-wide mt-0.5">{p.subtitle}</span>
               )}
+              <span className="block text-[0.6rem] font-normal text-ink-dim mt-0.5">
+                {quemPostou(p) ? `postado por @${quemPostou(p)} · ` : ''}
+                {formatDate(p.created_at)}
+              </span>
             </div>
           </div>
         ))}

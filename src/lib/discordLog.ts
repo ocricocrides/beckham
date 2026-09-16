@@ -1,10 +1,8 @@
 import { supabase } from '@/lib/supabase';
 
 export type LogAction =
-  | 'post_photo'
   | 'delete_photo'
   | 'restore_photo'
-  | 'post_announcement'
   | 'delete_announcement'
   | 'restore_announcement'
   | 'delete_profile'

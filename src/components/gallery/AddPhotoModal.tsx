@@ -5,7 +5,7 @@ import { FormField, FileInput, inputClass } from '@/components/layout/FormField'
 import { Btn } from '@/components/layout/Btn';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
-import { logDiscordAction } from '@/lib/discordLog';
+import { useAuth } from '@/context/AuthContext';
 
 async function uploadCrewPhoto(file: File) {
   const ext = (file.name.split('.').pop() || 'png').toLowerCase();
@@ -32,6 +32,7 @@ export function AddPhotoModal({
   const [msg, setMsg] = useState('');
   const [msgKind, setMsgKind] = useState<'' | 'error' | 'success'>('');
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const { profile } = useAuth();
 
   function reset() {
     setTitle('');
@@ -55,10 +56,11 @@ export function AddPhotoModal({
         title: tituloFinal,
         subtitle: subtitle.trim() || null,
         image_url,
+        posted_by_username: profile?.username || null,
+        posted_by_display_name: profile?.display_name || null,
       });
       if (error) throw error;
       onCreated();
-      logDiscordAction('post_photo', tituloFinal, image_url);
       reset();
       onOpenChange(false);
     } catch (err) {

@@ -6,7 +6,7 @@ import { FormField, FileInput, inputClass } from '@/components/layout/FormField'
 import { Btn } from '@/components/layout/Btn';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
-import { logDiscordAction } from '@/lib/discordLog';
+import { useAuth } from '@/context/AuthContext';
 
 async function uploadAnnouncementImage(file: File) {
   const ext = (file.name.split('.').pop() || 'png').toLowerCase();
@@ -35,6 +35,7 @@ export function CreateAnnouncementModal({
   const [msg, setMsg] = useState('');
   const [msgKind, setMsgKind] = useState<'' | 'error' | 'success'>('');
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const { profile } = useAuth();
 
   function reset() {
     setTitle('');
@@ -58,9 +59,10 @@ export function CreateAnnouncementModal({
         title: title.trim(),
         body: body.trim(),
         image_url,
+        posted_by_username: profile?.username || null,
+        posted_by_display_name: profile?.display_name || null,
       });
       if (error) throw error;
-      logDiscordAction('post_announcement', title.trim(), image_url);
 
       let discordWarning = '';
       if (sendToDiscord) {

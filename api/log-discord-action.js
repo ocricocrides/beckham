@@ -12,10 +12,8 @@ const SUPABASE_ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5d2JpY3RoZXZnZm11a2VteHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwODU2NzUsImV4cCI6MjEwNDY2MTY3NX0.Mm2rpXt-6U3kAg4WUOSHYWWlQbDAxUFgzEitn3HUXqE';
 
 const ACTIONS = {
-  post_photo: { label: 'postou uma foto' },
   delete_photo: { label: 'apagou uma foto' },
   restore_photo: { label: 'restaurou uma foto' },
-  post_announcement: { label: 'postou um anúncio' },
   delete_announcement: { label: 'apagou um anúncio' },
   restore_announcement: { label: 'restaurou um anúncio' },
   delete_profile: { label: 'excluiu a conta de' },

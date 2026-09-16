@@ -5,10 +5,16 @@ import { useAnnouncements, useAnnouncementsTrash } from '@/hooks/useAnnouncement
 import { useConfirm } from '@/hooks/useConfirm';
 import { supabase } from '@/lib/supabase';
 import { logDiscordAction } from '@/lib/discordLog';
+import { formatDate } from '@/lib/utils';
 import { Btn } from '@/components/layout/Btn';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { CreateAnnouncementModal } from './CreateAnnouncementModal';
 import type { Announcement } from '@/hooks/useAnnouncements';
+
+/** "@fulano" de quem postou, ou null se o anúncio for de antes dessa informação existir. */
+function quemPostou(a: Announcement) {
+  return a.posted_by_display_name || a.posted_by_username || null;
+}
 
 export function AnnouncementsList() {
   const { isAdmin, profile } = useAuth();
@@ -31,7 +37,9 @@ export function AnnouncementsList() {
     if (error) alert('Erro ao excluir: ' + error.message);
     else {
       reload();
-      logDiscordAction('delete_announcement', a.title, a.image_url);
+      const quem = quemPostou(a);
+      const subject = `${a.title} (postado${quem ? ` por @${quem}` : ''} em ${formatDate(a.created_at)})`;
+      logDiscordAction('delete_announcement', subject, a.image_url);
     }
   }
 
@@ -90,6 +98,7 @@ export function AnnouncementsList() {
           <h4 className="text-ink text-[1.15rem] mb-1.5 pr-8">{a.title}</h4>
           <div className="text-brand text-[0.72rem] font-bold tracking-wide mb-3">
             {new Date(a.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+            {quemPostou(a) && <span className="text-ink-dim font-normal"> · postado por @{quemPostou(a)}</span>}
           </div>
           <p className="text-ink-dim text-[0.95rem] leading-[1.6] whitespace-pre-wrap">{a.body}</p>
           {a.image_url && (
