@@ -32,6 +32,17 @@ export function Footer() {
         <div className="max-[760px]:w-full max-[760px]:text-[0.72rem]">
           © 2026 BECKHAM — A comunidade é real. O que acontece no jogo é roleplay.
         </div>
+        <div className="max-[760px]:w-full max-[760px]:text-[0.72rem]">
+          Feito por:{' '}
+          <a
+            href="https://discord.gg/NxkaUKw99b"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold text-red-500 hover:text-red-400 transition-colors"
+          >
+            Balt
+          </a>
+        </div>
       </div>
     </footer>
   );
