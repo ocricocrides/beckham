@@ -33,6 +33,18 @@ export function normalizeProfileRoles<T extends RawProfileWithMemberRoles>(
   const roles = (member_roles ?? [])
     .map((mr) => mr.roles)
     .filter((r): r is Role => r !== null)
-    .sort((a, b) => a.sort_order - b.sort_order);
+    .sort((a, b) => {
+      if (a.tipo !== b.tipo) return a.tipo === 'principal' ? -1 : 1;
+      return a.sort_order - b.sort_order;
+    });
   return { ...rest, roles } as MemberProfileWithRoles;
+}
+
+/**
+ * Admin "de verdade": o flag manual do perfil OU algum cargo marcado como is_admin.
+ * Espelha o mesmo OR que a policy is_effective_admin() faz no banco (ver migração
+ * add_role_types_and_permissions) — se mudar um lado, muda o outro.
+ */
+export function isEffectiveAdmin(profile: MemberProfileWithRoles | null): boolean {
+  return !!profile?.is_admin || !!profile?.roles.some((r) => r.is_admin);
 }

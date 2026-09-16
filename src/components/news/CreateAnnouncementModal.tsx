@@ -6,6 +6,7 @@ import { FormField, FileInput, inputClass } from '@/components/layout/FormField'
 import { Btn } from '@/components/layout/Btn';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
+import { logDiscordAction } from '@/lib/discordLog';
 
 async function uploadAnnouncementImage(file: File) {
   const ext = (file.name.split('.').pop() || 'png').toLowerCase();
@@ -59,6 +60,7 @@ export function CreateAnnouncementModal({
         image_url,
       });
       if (error) throw error;
+      logDiscordAction('post_announcement', title.trim());
 
       let discordWarning = '';
       if (sendToDiscord) {

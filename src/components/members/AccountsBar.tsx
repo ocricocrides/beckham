@@ -2,14 +2,12 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { ProfileEditorModal } from '@/components/profile/ProfileEditorModal';
-import { AdminPanelModal } from '@/components/admin/AdminPanelModal';
 import { Btn } from '@/components/layout/Btn';
 
 export function AccountsBar() {
   const { user, profile } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
-  const [adminOpen, setAdminOpen] = useState(false);
 
   return (
     <div className="mt-7 flex items-center justify-between gap-3.5 flex-wrap pb-7 border-b border-line">
@@ -27,16 +25,10 @@ export function AccountsBar() {
           <Btn variant="outline" onClick={() => setEditorOpen(true)}>
             Meu Perfil
           </Btn>
-          {profile?.is_admin && (
-            <Btn variant="outline" onClick={() => setAdminOpen(true)}>
-              Painel ADM
-            </Btn>
-          )}
         </div>
       )}
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
       <ProfileEditorModal open={editorOpen} onOpenChange={setEditorOpen} />
-      <AdminPanelModal open={adminOpen} onOpenChange={setAdminOpen} />
     </div>
   );
 }

@@ -8,6 +8,10 @@ import NoticiasPage from '@/pages/NoticiasPage';
 import RankingPage from '@/pages/RankingPage';
 import HistoriaPage from '@/pages/HistoriaPage';
 import PerfilPage from '@/pages/PerfilPage';
+import AdminPage from '@/pages/AdminPage';
+import AdminInicioPage from '@/pages/AdminInicioPage';
+import AdminMembrosPage from '@/pages/AdminMembrosPage';
+import AdminCargosPage from '@/pages/AdminCargosPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 function App() {
@@ -34,6 +38,11 @@ function App() {
         <Route path="ranking" element={<RankingPage />} />
         <Route path="historia" element={<HistoriaPage />} />
         <Route path="perfil/:username" element={<PerfilPage />} />
+        <Route path="admin" element={<AdminPage />}>
+          <Route index element={<AdminInicioPage />} />
+          <Route path="membros" element={<AdminMembrosPage />} />
+          <Route path="cargos" element={<AdminCargosPage />} />
+        </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

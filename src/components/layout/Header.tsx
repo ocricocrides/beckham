@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/lib/constants';
+import { useAuth } from '@/context/AuthContext';
 
 export function Header() {
   const [navOpen, setNavOpen] = useState(false);
+  const { isAdmin } = useAuth();
 
   return (
     // sticky (e nao fixed): ocupa o proprio espaco no fluxo, entao o main nao
@@ -59,6 +61,22 @@ export function Header() {
             {item.label}
           </NavLink>
         ))}
+        {isAdmin && (
+          <NavLink
+            to="/admin"
+            onClick={() => setNavOpen(false)}
+            className={({ isActive }) =>
+              cn(
+                'clip-corner-sm max-[760px]:[clip-path:none] bg-none border border-transparent text-brand text-[0.85rem] font-bold tracking-wide px-[18px] py-[9px] cursor-pointer transition-colors',
+                'max-[760px]:px-2 max-[760px]:py-3 max-[760px]:text-left',
+                'hover:text-ink',
+                isActive && 'text-ink bg-brand/[0.08] border-line',
+              )
+            }
+          >
+            ADM
+          </NavLink>
+        )}
       </nav>
     </header>
   );

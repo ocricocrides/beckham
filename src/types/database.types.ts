@@ -53,6 +53,7 @@ export type Database = {
           body: string;
           color: string | null;
           created_at: string;
+          deleted_at: string | null;
           id: string;
           image_url: string | null;
           posted_by_discord_id: string | null;
@@ -62,6 +63,7 @@ export type Database = {
           body: string;
           color?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           id?: string;
           image_url?: string | null;
           posted_by_discord_id?: string | null;
@@ -71,6 +73,7 @@ export type Database = {
           body?: string;
           color?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           id?: string;
           image_url?: string | null;
           posted_by_discord_id?: string | null;
@@ -87,6 +90,7 @@ export type Database = {
       crew_photos: {
         Row: {
           created_at: string;
+          deleted_at: string | null;
           id: string;
           image_url: string;
           posted_by_discord_id: string | null;
@@ -95,6 +99,7 @@ export type Database = {
         };
         Insert: {
           created_at?: string;
+          deleted_at?: string | null;
           id?: string;
           image_url: string;
           posted_by_discord_id?: string | null;
@@ -103,6 +108,7 @@ export type Database = {
         };
         Update: {
           created_at?: string;
+          deleted_at?: string | null;
           id?: string;
           image_url?: string;
           posted_by_discord_id?: string | null;
@@ -175,6 +181,10 @@ export type Database = {
           avatar_url: string | null;
           banner_url: string | null;
           bio: string | null;
+          can_post_photos: boolean;
+          can_delete_photos: boolean;
+          can_post_announcements: boolean;
+          can_delete_announcements: boolean;
           created_at: string;
           discord_id: string | null;
           discord_url: string | null;
@@ -196,6 +206,10 @@ export type Database = {
           avatar_url?: string | null;
           banner_url?: string | null;
           bio?: string | null;
+          can_post_photos?: boolean;
+          can_delete_photos?: boolean;
+          can_post_announcements?: boolean;
+          can_delete_announcements?: boolean;
           created_at?: string;
           discord_id?: string | null;
           discord_url?: string | null;
@@ -217,6 +231,10 @@ export type Database = {
           avatar_url?: string | null;
           banner_url?: string | null;
           bio?: string | null;
+          can_post_photos?: boolean;
+          can_delete_photos?: boolean;
+          can_post_announcements?: boolean;
+          can_delete_announcements?: boolean;
           created_at?: string;
           discord_id?: string | null;
           discord_url?: string | null;
@@ -285,6 +303,12 @@ export type Database = {
           sort_order: number;
           color: string | null;
           discord_role_id: string | null;
+          tipo: string;
+          is_admin: boolean;
+          can_post_photos: boolean;
+          can_delete_photos: boolean;
+          can_post_announcements: boolean;
+          can_delete_announcements: boolean;
         };
         Insert: {
           created_at?: string;
@@ -293,6 +317,12 @@ export type Database = {
           sort_order?: number;
           color?: string | null;
           discord_role_id?: string | null;
+          tipo?: string;
+          is_admin?: boolean;
+          can_post_photos?: boolean;
+          can_delete_photos?: boolean;
+          can_post_announcements?: boolean;
+          can_delete_announcements?: boolean;
         };
         Update: {
           created_at?: string;
@@ -301,12 +331,25 @@ export type Database = {
           sort_order?: number;
           color?: string | null;
           discord_role_id?: string | null;
+          tipo?: string;
+          is_admin?: boolean;
+          can_post_photos?: boolean;
+          can_delete_photos?: boolean;
+          can_post_announcements?: boolean;
+          can_delete_announcements?: boolean;
         };
         Relationships: [];
       };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      is_effective_admin: { Args: { p_uid: string }; Returns: boolean };
+      can_post_photos: { Args: { p_uid: string }; Returns: boolean };
+      can_delete_photos: { Args: { p_uid: string }; Returns: boolean };
+      can_post_announcements: { Args: { p_uid: string }; Returns: boolean };
+      can_delete_announcements: { Args: { p_uid: string }; Returns: boolean };
+      recompute_member_principal: { Args: { p_member_id: string }; Returns: undefined };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };

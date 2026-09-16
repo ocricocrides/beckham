@@ -23,6 +23,18 @@
     {
       "source": "/historia",
       "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/membros",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/cargos",
+      "destination": "/index.html"
     }
   ],
   "crons": [

@@ -1,11 +1,14 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
-import type { MemberProfile } from '@/lib/supabase';
+import { supabase, MEMBER_ROLES_SELECT, normalizeProfileRoles, isEffectiveAdmin } from '@/lib/supabase';
+import type { MemberProfileWithRoles } from '@/lib/supabase';
+import { useRealtimeTable } from '@/context/RealtimeContext';
 
 interface AuthContextValue {
   user: User | null;
-  profile: MemberProfile | null;
+  profile: MemberProfileWithRoles | null;
+  /** profile.is_admin OU algum cargo do membro com is_admin=true — o que realmente vale. */
+  isAdmin: boolean;
   loading: boolean;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -26,7 +29,7 @@ async function ensureProfile(user: User) {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<MemberProfile | null>(null);
+  const [profile, setProfile] = useState<MemberProfileWithRoles | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadMyProfile = useCallback(async (currentUser: User | null) => {
@@ -34,8 +37,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       return;
     }
-    const { data } = await supabase.from('member_profiles').select('*').eq('id', currentUser.id).maybeSingle();
-    setProfile(data);
+    const { data } = await supabase
+      .from('member_profiles')
+      .select(MEMBER_ROLES_SELECT)
+      .eq('id', currentUser.id)
+      .maybeSingle();
+    setProfile(data ? normalizeProfileRoles(data) : null);
   }, []);
 
   useEffect(() => {
@@ -55,12 +62,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshProfile = useCallback(() => loadMyProfile(user), [loadMyProfile, user]);
 
+  // Se um admin mudar os cargos de alguém (ou editar um cargo, ex: ligar/desligar o ADM dele)
+  // em outra aba/sessão, quem está logado vê o próprio status atualizar sem recarregar a página.
+  useRealtimeTable('member_roles', refreshProfile);
+  useRealtimeTable('roles', refreshProfile);
+
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, refreshProfile, signOut }}>
+    <AuthContext.Provider value={{ user, profile, isAdmin: isEffectiveAdmin(profile), loading, refreshProfile, signOut }}>
       {children}
     </AuthContext.Provider>
   );
