@@ -31,7 +31,7 @@ export function AnnouncementsList() {
     if (error) alert('Erro ao excluir: ' + error.message);
     else {
       reload();
-      logDiscordAction('delete_announcement', a.title);
+      logDiscordAction('delete_announcement', a.title, a.image_url);
     }
   }
 
@@ -111,7 +111,7 @@ function AnnouncementsTrashModal({ open, onOpenChange }: { open: boolean; onOpen
     if (error) alert('Erro ao restaurar: ' + error.message);
     else {
       reload();
-      logDiscordAction('restore_announcement', a.title);
+      logDiscordAction('restore_announcement', a.title, a.image_url);
     }
   }
 

@@ -60,7 +60,7 @@ export function CreateAnnouncementModal({
         image_url,
       });
       if (error) throw error;
-      logDiscordAction('post_announcement', title.trim());
+      logDiscordAction('post_announcement', title.trim(), image_url);
 
       let discordWarning = '';
       if (sendToDiscord) {

@@ -58,7 +58,7 @@ export function AddPhotoModal({
       });
       if (error) throw error;
       onCreated();
-      logDiscordAction('post_photo', tituloFinal);
+      logDiscordAction('post_photo', tituloFinal, image_url);
       reset();
       onOpenChange(false);
     } catch (err) {

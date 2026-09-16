@@ -31,7 +31,7 @@ export function GalleryGrid() {
     if (error) alert('Erro ao excluir: ' + error.message);
     else {
       reload();
-      logDiscordAction('delete_photo', p.title);
+      logDiscordAction('delete_photo', p.title, p.image_url);
     }
   }
 
@@ -122,7 +122,7 @@ function GalleryTrashModal({ open, onOpenChange }: { open: boolean; onOpenChange
     if (error) alert('Erro ao restaurar: ' + error.message);
     else {
       reload();
-      logDiscordAction('restore_photo', p.title);
+      logDiscordAction('restore_photo', p.title, p.image_url);
     }
   }
 
