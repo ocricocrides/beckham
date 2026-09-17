@@ -1,0 +1,10 @@
+-- Aplicado em 2026-09-17 (migrations security_hardening_2026_09_17 e security_hardening_fix_role_check).
+-- Resumo, pra referência:
+-- 1. member_profiles_urls_http_check: links do perfil só aceitam http(s) ou vazio (bloqueia javascript:).
+-- 2. trigger only_soft_delete_for_non_admin em crew_photos/announcements: quem não é admin só muda deleted_at.
+-- 3. trigger discord_link_request_defaults: código de vínculo gerado pelo banco (gen_random_bytes),
+--    status/validade/discord_id fixados na criação pelo usuário.
+-- 4. tabela signup_attempts (hash do IP) usada pela função signup pra limitar 5 contas/IP/hora.
+-- 5. search_path fixo em protect_member_privileged_columns e discord_log_liga; trg_assign_default_role
+--    sem EXECUTE pra anon/authenticated.
+-- Os triggers checam auth.role(): bot, cron (service_role) e SQL Editor não são afetados.

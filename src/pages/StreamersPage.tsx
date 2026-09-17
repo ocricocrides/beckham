@@ -16,6 +16,7 @@ import {
   type StreamPlatform,
 } from '@/hooks/useStreamPlatforms';
 import { DEFAULT_AVATAR, DEFAULT_BANNER, TICKET_URL } from '@/lib/constants';
+import { safeHttpUrl } from '@/lib/utils';
 import type { MemberProfileWithRoles } from '@/lib/supabase';
 
 type Tab = 'todos' | StreamPlatform;
@@ -29,7 +30,7 @@ const PLATFORM_COLOR: Record<StreamPlatform, string> = {
 function StreamerCard({ profile, platforms }: { profile: MemberProfileWithRoles; platforms: StreamPlatform[] }) {
   const principal = profile.roles.find((r) => r.tipo === 'principal');
   const links = platforms
-    .map((p) => ({ platform: p, url: profile[STREAM_PLATFORM_URL_COLUMN[p]] }))
+    .map((p) => ({ platform: p, url: safeHttpUrl(profile[STREAM_PLATFORM_URL_COLUMN[p]]) }))
     .filter((l): l is { platform: StreamPlatform; url: string } => !!l.url);
 
   return (

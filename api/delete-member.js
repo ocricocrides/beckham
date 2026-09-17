@@ -16,6 +16,8 @@ const SUPABASE_ANON_KEY =
   process.env.VITE_SUPABASE_ANON_KEY ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5d2JpY3RoZXZnZm11a2VteHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwODU2NzUsImV4cCI6MjEwNDY2MTY3NX0.Mm2rpXt-6U3kAg4WUOSHYWWlQbDAxUFgzEitn3HUXqE';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 async function getUserIdFromToken(accessToken) {
   const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${accessToken}` },
@@ -97,7 +99,7 @@ export default async function handler(req, res) {
   }
 
   const { memberId } = req.body || {};
-  if (!memberId || typeof memberId !== 'string') {
+  if (typeof memberId !== 'string' || !UUID_RE.test(memberId)) {
     return res.status(400).send(JSON.stringify({ error: 'memberId inválido.' }));
   }
   if (memberId === callerId) {
@@ -111,12 +113,13 @@ export default async function handler(req, res) {
       headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
     });
     if (!r.ok && r.status !== 404) {
-      const detalhe = await r.text();
-      return res.status(502).send(JSON.stringify({ error: 'Supabase recusou excluir a conta.', dica: detalhe }));
+      console.error('delete-member: Supabase recusou excluir a conta:', r.status, await r.text());
+      return res.status(502).send(JSON.stringify({ error: 'Supabase recusou excluir a conta.' }));
     }
     if (r.ok) await logExclusao(caller, target, serviceKey);
     return res.status(200).send(JSON.stringify({ ok: true }));
   } catch (e) {
-    return res.status(500).send(JSON.stringify({ error: 'Falha ao excluir a conta.', dica: e.message }));
+    console.error('delete-member:', e);
+    return res.status(500).send(JSON.stringify({ error: 'Falha ao excluir a conta.' }));
   }
 }

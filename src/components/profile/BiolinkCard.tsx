@@ -4,6 +4,7 @@ import { SocialIcon, type SocialKind } from './SocialIcon';
 import { MusicEmbed } from './MusicEmbed';
 import { GlowCard } from '@/components/glow-card/GlowCard';
 import { DEFAULT_AVATAR, DEFAULT_BANNER } from '@/lib/constants';
+import { safeHttpUrl } from '@/lib/utils';
 import type { MemberProfileWithRoles } from '@/lib/supabase';
 
 export function BiolinkCard({ profile }: { profile: MemberProfileWithRoles }) {
@@ -20,7 +21,9 @@ export function BiolinkCard({ profile }: { profile: MemberProfileWithRoles }) {
       ['tiktok', profile.tiktok_url],
       ['discord', profile.discord_url],
     ] as [SocialKind, string | null][]
-  ).filter((s): s is [SocialKind, string] => Boolean(s[1]));
+  )
+    .map(([kind, url]) => [kind, safeHttpUrl(url)] as [SocialKind, string | null])
+    .filter((s): s is [SocialKind, string] => Boolean(s[1]));
 
   async function handleCopy() {
     const url = `${location.origin}/perfil/${profile.username}`;

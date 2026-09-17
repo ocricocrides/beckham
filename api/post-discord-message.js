@@ -84,7 +84,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({ embeds: [embed] }),
     });
     if (!r.ok) {
-      const detalhe = await r.text();
+      console.error('post-discord-message: Discord recusou:', r.status, await r.text());
       const msg =
         r.status === 403
           ? 'O bot não tem permissão para postar nesse canal.'
@@ -92,11 +92,12 @@ export default async function handler(req, res) {
             ? 'Canal não encontrado (verifique o ID).'
             : `Discord recusou (status ${r.status}).`;
       return res.status(r.status === 404 || r.status === 403 ? r.status : 502).send(
-        JSON.stringify({ error: msg, dica: detalhe }),
+        JSON.stringify({ error: msg }),
       );
     }
     return res.status(200).send(JSON.stringify({ ok: true }));
   } catch (e) {
-    return res.status(500).send(JSON.stringify({ error: 'Falha ao falar com o Discord.', dica: e.message }));
+    console.error('post-discord-message:', e);
+    return res.status(500).send(JSON.stringify({ error: 'Falha ao falar com o Discord.' }));
   }
 }
