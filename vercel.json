@@ -47,6 +47,10 @@
     {
       "source": "/admin/destaques",
       "destination": "/index.html"
+    },
+    {
+      "source": "/admin/registros",
+      "destination": "/index.html"
     }
   ],
   "headers": [
