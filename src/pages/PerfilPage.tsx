@@ -7,10 +7,12 @@ import { DEFAULT_BANNER } from '@/lib/constants';
 import { Btn } from '@/components/layout/Btn';
 import { BiolinkCard } from '@/components/profile/BiolinkCard';
 import { usePageMeta } from '@/hooks/usePageMeta';
+import { useAuth } from '@/context/AuthContext';
 
 export default function PerfilPage() {
   const { username } = useParams();
   const navigate = useNavigate();
+  const { user, isAdmin } = useAuth();
   const [profile, setProfile] = useState<MemberProfileWithRoles | null | undefined>(undefined);
 
   usePageMeta(
@@ -31,12 +33,15 @@ export default function PerfilPage() {
       .eq('username', username)
       .maybeSingle()
       .then(({ data }) => {
-        if (!cancelled) setProfile(data ? normalizeProfileRoles(data) : null);
+        if (cancelled) return;
+        // Conta sem registro aprovado não tem perfil público (só a própria pessoa e a ADM veem).
+        const visivel = data && (data.is_member || data.id === user?.id || isAdmin);
+        setProfile(visivel ? normalizeProfileRoles(data) : null);
       });
     return () => {
       cancelled = true;
     };
-  }, [username]);
+  }, [username, user?.id, isAdmin]);
 
   const bgImage = profile ? profile.banner_url || profile.avatar_url || DEFAULT_BANNER : null;
 

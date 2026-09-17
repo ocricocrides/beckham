@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { FormField, inputClass } from '@/components/layout/FormField';
@@ -11,6 +12,7 @@ type MsgKind = '' | 'error' | 'success';
 
 export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const [tab, setTab] = useState<Tab>('login');
+  const navigate = useNavigate();
 
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -80,6 +82,8 @@ export function AuthModal({ open, onOpenChange }: { open: boolean; onOpenChange:
     }
     setSignupMsg('');
     onOpenChange(false);
+    // Conta nova ainda não é de membro: segue direto pro vínculo com o Discord e o formulário.
+    navigate('/registro');
   }
 
   return (

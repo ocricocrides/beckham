@@ -4,11 +4,10 @@ import { MEMBER_ROLES_SELECT, normalizeProfileRoles } from '@/lib/supabase';
 import type { MemberProfileWithRoles } from '@/lib/supabase';
 import { useRealtimeTable } from '@/context/RealtimeContext';
 
-async function fetchAllProfiles(): Promise<MemberProfileWithRoles[]> {
-  const { data, error } = await supabase
-    .from('member_profiles')
-    .select(MEMBER_ROLES_SELECT)
-    .order('created_at', { ascending: true });
+async function fetchAllProfiles(includePending: boolean): Promise<MemberProfileWithRoles[]> {
+  let query = supabase.from('member_profiles').select(MEMBER_ROLES_SELECT);
+  if (!includePending) query = query.eq('is_member', true);
+  const { data, error } = await query.order('created_at', { ascending: true });
   if (error || !data) return [];
   return data.map(normalizeProfileRoles).sort((a, b) => {
     const oa = a.roles[0] ? a.roles[0].sort_order : Infinity;
@@ -18,12 +17,13 @@ async function fetchAllProfiles(): Promise<MemberProfileWithRoles[]> {
   });
 }
 
-export function useProfiles() {
+/** Por padrão só membros aprovados; o painel da ADM passa includePending pra ver todo mundo. */
+export function useProfiles({ includePending = false }: { includePending?: boolean } = {}) {
   const [profiles, setProfiles] = useState<MemberProfileWithRoles[] | null>(null);
 
   const reload = useCallback(async () => {
-    setProfiles(await fetchAllProfiles());
-  }, []);
+    setProfiles(await fetchAllProfiles(includePending));
+  }, [includePending]);
 
   useEffect(() => {
     reload();

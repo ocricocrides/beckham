@@ -74,7 +74,7 @@ const CHAPTERS: Chapter[] = [
     ),
   },
   {
-    year: '2020 — 2022',
+    year: '2020 a 2022',
     title: 'A ascensão',
     paragraphs: [
       <>
@@ -109,7 +109,7 @@ const CHAPTERS: Chapter[] = [
     list: ['GTA RP brasileiro', 'GTA RP português', 'Servidores de GTA no Xbox', 'E também em outros jogos'],
     outro: (
       <>
-        A Beckham havia se transformado em algo maior do que um grupo dentro de um servidor. Era uma comunidade —
+        A Beckham havia se transformado em algo maior do que um grupo dentro de um servidor. Era uma comunidade:
         um nome que diferentes pessoas carregavam em diferentes jogos e diferentes plataformas.
       </>
     ),
@@ -208,7 +208,7 @@ export default function HistoriaPage() {
     <Wrap>
       <SectionHead
         title="História"
-        description="Oito anos de BECKHAM — de uma família dentro de um servidor até um nome carregado em vários jogos."
+        description="Oito anos de BECKHAM, de uma família dentro de um servidor até um nome carregado em vários jogos."
       />
 
       <p className="mt-10 text-[clamp(1.2rem,2.6vw,1.5rem)] leading-[1.6] text-ink max-w-[760px] border-l-[3px] border-brand pl-6">
@@ -304,7 +304,7 @@ export default function HistoriaPage() {
             BECKHAM
           </div>
           <div className="font-display font-bold text-brand text-[clamp(1.1rem,3vw,1.5rem)] tracking-[4px] mt-4">
-            2018 — ∞
+            2018 · ∞
           </div>
           <p className="text-ink-dim text-[1.05rem] mt-6">Uma família. Uma tropa. Uma organização. Um legado.</p>
         </div>

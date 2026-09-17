@@ -3,6 +3,7 @@ import { useAuth } from '@/context/AuthContext';
 import { usePresence } from '@/context/PresenceContext';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useRoles } from '@/hooks/useRoles';
+import { useStreamPlatforms, type StreamPlatform } from '@/hooks/useStreamPlatforms';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { useConfirm } from '@/hooks/useConfirm';
 import { supabase } from '@/lib/supabase';
@@ -23,8 +24,9 @@ export default function AdminMembrosPage() {
 
   const { user, refreshProfile } = useAuth();
   const { onlineIds } = usePresence();
-  const { profiles, reload: reloadProfiles } = useProfiles();
+  const { profiles, reload: reloadProfiles } = useProfiles({ includePending: true });
   const { roles } = useRoles();
+  const { byMember: platformsByMember, reload: reloadPlatforms } = useStreamPlatforms();
   const confirm = useConfirm();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
@@ -40,6 +42,18 @@ export default function AdminMembrosPage() {
       return;
     }
     reloadProfiles();
+  }
+
+  async function handlePlatformToggle(memberId: string, platform: StreamPlatform, checked: boolean) {
+    const { error } = checked
+      ? await supabase.from('member_stream_platforms').insert({ member_id: memberId, platform })
+      : await supabase.from('member_stream_platforms').delete().eq('member_id', memberId).eq('platform', platform);
+    if (error) {
+      setMsgKind('error');
+      setMsg('Erro: ' + error.message);
+      return;
+    }
+    reloadPlatforms();
   }
 
   async function handleAdminToggle(memberId: string, checked: boolean) {
@@ -160,6 +174,7 @@ export default function AdminMembrosPage() {
                 <span className="text-ink text-[0.82rem] font-semibold truncate w-full">
                   {p.display_name || p.username}
                 </span>
+                {!p.is_member && <span className="text-brand text-[0.7rem] font-bold tracking-wide">Sem registro</span>}
               </button>
             );
           })}
@@ -187,6 +202,8 @@ export default function AdminMembrosPage() {
         onRemoveAvatar={handleRemoveAvatar}
         onRenameDisplayName={handleRenameDisplayName}
         onDeleteAccount={handleDeleteAccount}
+        platforms={editing ? (platformsByMember.get(editing.id) ?? []) : []}
+        onTogglePlatform={handlePlatformToggle}
       />
     </div>
   );

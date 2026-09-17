@@ -9,6 +9,8 @@ interface AuthContextValue {
   profile: MemberProfileWithRoles | null;
   /** profile.is_admin OU algum cargo do membro com is_admin=true — o que realmente vale. */
   isAdmin: boolean;
+  /** Registro aprovado pela staff no Discord: só membro usa o site como membro. */
+  isMember: boolean;
   loading: boolean;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -66,13 +68,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // em outra aba/sessão, quem está logado vê o próprio status atualizar sem recarregar a página.
   useRealtimeTable('member_roles', refreshProfile);
   useRealtimeTable('roles', refreshProfile);
+  // Vínculo com o Discord e aprovação do registro chegam pelo bot, direto no perfil.
+  useRealtimeTable('member_profiles', refreshProfile);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, profile, isAdmin: isEffectiveAdmin(profile), loading, refreshProfile, signOut }}>
+    <AuthContext.Provider value={{ user, profile, isAdmin: isEffectiveAdmin(profile), isMember: !!profile?.is_member, loading, refreshProfile, signOut }}>
       {children}
     </AuthContext.Provider>
   );

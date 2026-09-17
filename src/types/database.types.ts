@@ -107,6 +107,27 @@ export type Database = {
         }
         Relationships: []
       }
+      clip_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       config_servidores: {
         Row: {
           data: Json
@@ -244,6 +265,53 @@ export type Database = {
           },
         ]
       }
+      discord_tickets: {
+        Row: {
+          category: string
+          closed_at: string | null
+          created_at: string
+          discord_channel_id: string | null
+          id: string
+          opener_discord_id: string
+          opener_tag: string | null
+          source_member_id: string | null
+          source_text: string | null
+          status: string
+        }
+        Insert: {
+          category: string
+          closed_at?: string | null
+          created_at?: string
+          discord_channel_id?: string | null
+          id?: string
+          opener_discord_id: string
+          opener_tag?: string | null
+          source_member_id?: string | null
+          source_text?: string | null
+          status?: string
+        }
+        Update: {
+          category?: string
+          closed_at?: string | null
+          created_at?: string
+          discord_channel_id?: string | null
+          id?: string
+          opener_discord_id?: string
+          opener_tag?: string | null
+          source_member_id?: string | null
+          source_text?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discord_tickets_source_member_id_fkey"
+            columns: ["source_member_id"]
+            isOneToOne: false
+            referencedRelation: "member_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       farm: {
         Row: {
           data: Json
@@ -261,6 +329,51 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      featured_clips: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          id: string
+          member_id: string | null
+          sort_order: number
+          title: string
+          url: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          sort_order?: number
+          title: string
+          url: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          sort_order?: number
+          title?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_clips_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "clip_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "featured_clips_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "member_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       historico: {
         Row: {
@@ -289,6 +402,7 @@ export type Database = {
           can_delete_photos: boolean
           can_post_announcements: boolean
           can_post_photos: boolean
+          card_role_id: string | null
           created_at: string
           discord_id: string | null
           discord_url: string | null
@@ -296,6 +410,7 @@ export type Database = {
           id: string
           instagram_url: string | null
           is_admin: boolean
+          is_member: boolean
           location: string | null
           music_url: string | null
           role_id: string | null
@@ -315,6 +430,7 @@ export type Database = {
           can_delete_photos?: boolean
           can_post_announcements?: boolean
           can_post_photos?: boolean
+          card_role_id?: string | null
           created_at?: string
           discord_id?: string | null
           discord_url?: string | null
@@ -322,6 +438,7 @@ export type Database = {
           id: string
           instagram_url?: string | null
           is_admin?: boolean
+          is_member?: boolean
           location?: string | null
           music_url?: string | null
           role_id?: string | null
@@ -341,6 +458,7 @@ export type Database = {
           can_delete_photos?: boolean
           can_post_announcements?: boolean
           can_post_photos?: boolean
+          card_role_id?: string | null
           created_at?: string
           discord_id?: string | null
           discord_url?: string | null
@@ -348,6 +466,7 @@ export type Database = {
           id?: string
           instagram_url?: string | null
           is_admin?: boolean
+          is_member?: boolean
           location?: string | null
           music_url?: string | null
           role_id?: string | null
@@ -360,6 +479,13 @@ export type Database = {
           youtube_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "member_profiles_card_role_id_fkey"
+            columns: ["card_role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "member_profiles_role_id_fkey"
             columns: ["role_id"]
@@ -398,6 +524,32 @@ export type Database = {
             columns: ["role_id"]
             isOneToOne: false
             referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_stream_platforms: {
+        Row: {
+          created_at: string
+          member_id: string
+          platform: string
+        }
+        Insert: {
+          created_at?: string
+          member_id: string
+          platform: string
+        }
+        Update: {
+          created_at?: string
+          member_id?: string
+          platform?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_stream_platforms_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "member_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -449,6 +601,7 @@ export type Database = {
           discord_role_id: string | null
           id: string
           is_admin: boolean
+          is_streamer: boolean
           name: string
           show_on_card: boolean
           sort_order: number
@@ -464,6 +617,7 @@ export type Database = {
           discord_role_id?: string | null
           id?: string
           is_admin?: boolean
+          is_streamer?: boolean
           name: string
           show_on_card?: boolean
           sort_order?: number
@@ -479,6 +633,7 @@ export type Database = {
           discord_role_id?: string | null
           id?: string
           is_admin?: boolean
+          is_streamer?: boolean
           name?: string
           show_on_card?: boolean
           sort_order?: number
@@ -486,11 +641,99 @@ export type Database = {
         }
         Relationships: []
       }
+      site_registrations: {
+        Row: {
+          discord_id: string
+          id_jogo: string
+          member_id: string
+          nome: string
+          posted_at: string | null
+          recrutador: string
+          reviewed_at: string | null
+          reviewed_by_discord_id: string | null
+          status: string
+          submitted_at: string
+          telefone: string
+        }
+        Insert: {
+          discord_id: string
+          id_jogo: string
+          member_id: string
+          nome: string
+          posted_at?: string | null
+          recrutador: string
+          reviewed_at?: string | null
+          reviewed_by_discord_id?: string | null
+          status?: string
+          submitted_at?: string
+          telefone: string
+        }
+        Update: {
+          discord_id?: string
+          id_jogo?: string
+          member_id?: string
+          nome?: string
+          posted_at?: string | null
+          recrutador?: string
+          reviewed_at?: string | null
+          reviewed_by_discord_id?: string | null
+          status?: string
+          submitted_at?: string
+          telefone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_registrations_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: true
+            referencedRelation: "member_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wall_posts: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          member_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          member_id?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          member_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wall_posts_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "member_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      enviar_registro: {
+        Args: {
+          p_id_jogo: string
+          p_nome: string
+          p_recrutador: string
+          p_telefone: string
+        }
+        Returns: undefined
+      }
       can_delete_announcements: { Args: { p_uid: string }; Returns: boolean }
       can_delete_photos: { Args: { p_uid: string }; Returns: boolean }
       can_post_announcements: { Args: { p_uid: string }; Returns: boolean }
@@ -500,6 +743,7 @@ export type Database = {
         Args: { p_member_id: string }
         Returns: undefined
       }
+      site_home_stats: { Args: never; Returns: Json }
     }
     Enums: {
       [_ in never]: never

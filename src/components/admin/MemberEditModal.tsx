@@ -1,7 +1,14 @@
 import type { FormEvent } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Btn } from '@/components/layout/Btn';
+import { Switch } from '@/components/ui/switch';
 import { DEFAULT_AVATAR } from '@/lib/constants';
+import {
+  STREAM_PLATFORMS,
+  STREAM_PLATFORM_LABEL,
+  STREAM_PLATFORM_URL_COLUMN,
+  type StreamPlatform,
+} from '@/hooks/useStreamPlatforms';
 import type { MemberProfileWithRoles, Role } from '@/lib/supabase';
 
 export type MemberPermissionColumn =
@@ -28,6 +35,8 @@ export function MemberEditModal({
   onRemoveAvatar,
   onRenameDisplayName,
   onDeleteAccount,
+  platforms,
+  onTogglePlatform,
 }: {
   member: MemberProfileWithRoles | null;
   roles: Role[];
@@ -40,6 +49,9 @@ export function MemberEditModal({
   onRemoveAvatar: (memberId: string) => void;
   onRenameDisplayName: (memberId: string, newName: string) => void;
   onDeleteAccount: (memberId: string) => void;
+  /** Plataformas em que o membro transmite (só aparece se ele tiver algum cargo de streamer). */
+  platforms: StreamPlatform[];
+  onTogglePlatform: (memberId: string, platform: StreamPlatform, checked: boolean) => void;
 }) {
   return (
     <Dialog open={!!member} onOpenChange={onOpenChange}>
@@ -141,6 +153,36 @@ export function MemberEditModal({
                 </label>
               ))}
             </div>
+
+            {member.roles.some((r) => r.is_streamer) && (
+              <div className="mt-5 pt-5 border-t border-line">
+                <div className="text-ink-dim text-[0.78rem] font-bold tracking-wide uppercase mb-1">
+                  Plataformas de streamer
+                </div>
+                <p className="text-ink-dim text-[0.7rem] mb-2.5">
+                  Define em quais abas da página Streamers ele aparece. O link vem do perfil dele.
+                </p>
+                <div className="flex flex-col gap-2">
+                  {STREAM_PLATFORMS.map((platform) => {
+                    const checked = platforms.includes(platform);
+                    const semLink = !member[STREAM_PLATFORM_URL_COLUMN[platform]];
+                    return (
+                      <label
+                        key={platform}
+                        className="flex items-center gap-2.5 text-ink text-[0.85rem] cursor-pointer"
+                        onClick={() => onTogglePlatform(member.id, platform, !checked)}
+                      >
+                        <Switch checked={checked} onChange={(v) => onTogglePlatform(member.id, platform, v)} />
+                        {STREAM_PLATFORM_LABEL[platform]}
+                        {checked && semLink && (
+                          <span className="text-brand text-[0.7rem]">sem link no perfil, não vai aparecer</span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {member.id !== currentUserId && (
               <div className="mt-6 pt-5 border-t border-line">

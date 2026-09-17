@@ -1,11 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { ProfileEditorModal } from '@/components/profile/ProfileEditorModal';
 import { Btn } from '@/components/layout/Btn';
 
 export function AccountsBar() {
-  const { user, profile } = useAuth();
+  const { user, profile, isMember } = useAuth();
+  const navigate = useNavigate();
   const [authOpen, setAuthOpen] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
 
@@ -22,9 +24,15 @@ export function AccountsBar() {
           <span className="text-brand font-bold font-display text-[0.85rem]">
             @{profile?.username ?? '...'}
           </span>
-          <Btn variant="outline" onClick={() => setEditorOpen(true)}>
-            Meu Perfil
-          </Btn>
+          {isMember ? (
+            <Btn variant="outline" onClick={() => setEditorOpen(true)}>
+              Meu Perfil
+            </Btn>
+          ) : (
+            <Btn variant="primary" onClick={() => navigate('/registro')}>
+              Finalizar registro
+            </Btn>
+          )}
         </div>
       )}
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />

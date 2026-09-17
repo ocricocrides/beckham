@@ -9,6 +9,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/streamers",
+      "destination": "/index.html"
+    },
+    {
       "source": "/fotos",
       "destination": "/index.html"
     },
@@ -25,6 +29,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/registro",
+      "destination": "/index.html"
+    },
+    {
       "source": "/admin",
       "destination": "/index.html"
     },
@@ -34,6 +42,10 @@
     },
     {
       "source": "/admin/cargos",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/destaques",
       "destination": "/index.html"
     }
   ],

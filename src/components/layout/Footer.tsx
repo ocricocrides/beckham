@@ -12,7 +12,7 @@ export function Footer() {
           <picture>
             <source srcSet="/assets/logo.webp" type="image/webp" />
             <img
-              className="h-[26px] w-auto block animate-logo-sway [transform-origin:50%_60%]"
+              className="h-[26px] w-auto block"
               src="/assets/logo.png"
               alt="BECKHAM"
               width={90}
@@ -30,7 +30,7 @@ export function Footer() {
           Suporte e contato: Discord
         </a>
         <div className="max-[760px]:w-full max-[760px]:text-[0.72rem]">
-          © 2026 BECKHAM — A comunidade é real. O que acontece no jogo é roleplay.
+          © 2026 BECKHAM · A comunidade é real. O que acontece no jogo é roleplay.
         </div>
         <div className="max-[760px]:w-full max-[760px]:text-[0.72rem]">
           Feito por:{' '}

@@ -7,6 +7,7 @@ const ADMIN_TABS = [
   { to: '/admin', label: 'Início', end: true },
   { to: '/admin/membros', label: 'Membros' },
   { to: '/admin/cargos', label: 'Cargos' },
+  { to: '/admin/destaques', label: 'Destaques' },
 ] as const;
 
 /**

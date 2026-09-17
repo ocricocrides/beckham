@@ -24,6 +24,7 @@ type RolePatch = Partial<
     | 'can_delete_announcements'
     | 'sort_order'
     | 'show_on_card'
+    | 'is_streamer'
   >
 >;
 
@@ -281,7 +282,7 @@ export default function AdminCargosPage() {
         </form>
         <p className="mt-3 text-ink-dim text-[0.78rem]">
           As permissões de postar/apagar fotos e anúncios, e o vínculo com o Discord, ficam editáveis no cargo depois
-          de criado — clique nele na lista abaixo.
+          de criado. É só clicar nele na lista abaixo.
         </p>
 
         <div className="mt-4 text-[0.78rem]">
@@ -453,15 +454,26 @@ export default function AdminCargosPage() {
                         <label
                           className="flex items-center gap-2 cursor-pointer"
                           onClick={() => handleRoleUpdate(r.id, { show_on_card: !r.show_on_card })}
-                          title="Mostra esse subcargo no card do membro, embaixo do cargo principal."
+                          title="Usado quando o membro não escolheu um subcargo no próprio perfil: aparece no card o mais alto marcado aqui. No perfil aparecem todos."
                         >
                           <Switch
                             checked={r.show_on_card}
                             onChange={(checked) => handleRoleUpdate(r.id, { show_on_card: checked })}
                           />
-                          Aparecer no perfil
+                          Aparecer no card
                         </label>
                       )}
+                      <label
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => handleRoleUpdate(r.id, { is_streamer: !r.is_streamer })}
+                        title="Quem tem esse cargo aparece na aba Streamers (as plataformas são marcadas em Membros)."
+                      >
+                        <Switch
+                          checked={r.is_streamer}
+                          onChange={(checked) => handleRoleUpdate(r.id, { is_streamer: checked })}
+                        />
+                        Streamer
+                      </label>
                     </div>
 
                     <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-[0.78rem] text-ink-dim mb-2">
@@ -515,7 +527,7 @@ export default function AdminCargosPage() {
                           onChange={(e) => handleDiscordLink(r.id, e.target.value)}
                           className={cn(selectClass, 'flex-1 min-w-0 text-[0.78rem] py-1')}
                         >
-                          <option value="">— definir na mão —</option>
+                          <option value="">Definir na mão</option>
                           {discordRoles.map((d) => (
                             <option key={d.id} value={d.id}>
                               {d.name}

@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import type { MemberProfileWithRoles } from '@/lib/supabase';
 import { getSocialLinkError } from '@/lib/socialLinks';
+import { useDiscordLink } from '@/hooks/useDiscordLink';
 
 type MsgKind = '' | 'error' | 'success';
 
@@ -36,6 +37,8 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
   const [twitch, setTwitch] = useState('');
   const [tiktok, setTiktok] = useState('');
   const [discord, setDiscord] = useState('');
+  /** '' = automático (o subcargo mais alto marcado pela ADM). */
+  const [cardRoleId, setCardRoleId] = useState('');
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -48,8 +51,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
   const [msgKind, setMsgKind] = useState<MsgKind>('');
   const [saving, setSaving] = useState(false);
 
-  const [linkStatus, setLinkStatus] = useState<{ text: string; code?: string } | null>(null);
-  const generatingRef = useRef(false);
+  const { status: linkStatus, refresh: refreshDiscordLinkStatus, generate: handleGenerateCode } = useDiscordLink();
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
 
@@ -65,6 +67,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     setTwitch(profile.twitch_url || '');
     setTiktok(profile.tiktok_url || '');
     setDiscord(profile.discord_url || '');
+    setCardRoleId(profile.card_role_id || '');
     setAvatarFile(null);
     setAvatarPreview(null);
     setAvatarRemoved(false);
@@ -76,50 +79,6 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     refreshDiscordLinkStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, profile?.id]);
-
-  async function refreshDiscordLinkStatus() {
-    if (!profile || !user) return;
-    if (profile.discord_id) {
-      setLinkStatus({ text: '✅ Sua conta está vinculada ao Discord.' });
-      return;
-    }
-    const { data } = await supabase
-      .from('discord_link_requests')
-      .select('*')
-      .eq('member_id', user.id)
-      .order('requested_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (!data) {
-      setLinkStatus({ text: 'Você ainda não vinculou sua conta ao Discord.' });
-      return;
-    }
-    const expirado = new Date(data.expires_at) < new Date();
-    if (data.status === 'pending_code' && !expirado) {
-      setLinkStatus({ text: `Rode /vincular codigo:${data.code} no Discord — expira em 15 minutos.`, code: data.code });
-    } else if (data.status === 'pending_approval') {
-      setLinkStatus({ text: '⏳ Pedido enviado — aguardando aprovação da staff no Discord.' });
-    } else if (data.status === 'rejected') {
-      setLinkStatus({ text: '❌ Seu último pedido de vínculo foi rejeitado pela staff. Gere um novo código se quiser tentar de novo.' });
-    } else {
-      setLinkStatus({ text: expirado ? 'O código anterior expirou. Gere um novo.' : 'Você ainda não vinculou sua conta ao Discord.' });
-    }
-  }
-
-  async function handleGenerateCode() {
-    if (!user || generatingRef.current) return;
-    generatingRef.current = true;
-    setLinkStatus({ text: 'Gerando código...' });
-    const codigo = String(Math.floor(100000 + Math.random() * 900000));
-    const { error } = await supabase.from('discord_link_requests').insert({ member_id: user.id, code: codigo });
-    generatingRef.current = false;
-    if (error) {
-      setLinkStatus({ text: 'Erro ao gerar código: ' + error.message });
-      return;
-    }
-    await refreshDiscordLinkStatus();
-  }
 
   function onAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
@@ -190,6 +149,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
         twitch_url: twitch.trim(),
         tiktok_url: tiktok.trim(),
         discord_url: discord.trim(),
+        card_role_id: cardRoleId || null,
         avatar_url,
         banner_url,
       };
@@ -218,6 +178,8 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     await signOut();
     onOpenChange(false);
   }
+
+  const subcargos = profile?.roles.filter((r) => r.tipo === 'secundario') ?? [];
 
   const previewProfile: MemberProfileWithRoles | null = useMemo(() => {
     if (!profile) return null;
@@ -268,6 +230,24 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
           <FormField label="Nome de exibição" htmlFor="pfDisplayName">
             <Input id="pfDisplayName" required maxLength={40} className={inputClass} value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
           </FormField>
+          {subcargos.length > 0 && (
+            <FormField label="Subcargo no card da aba Membros" htmlFor="pfCardRole">
+              <select
+                id="pfCardRole"
+                value={cardRoleId}
+                onChange={(e) => setCardRoleId(e.target.value)}
+                className={cn(inputClass, 'w-full h-10 px-3 text-[0.9rem]')}
+              >
+                <option value="">Automático (o mais alto)</option>
+                {subcargos.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-ink-dim text-[0.75rem] mt-1">No seu perfil aparecem todos os seus cargos.</p>
+            </FormField>
+          )}
           <FormField label="Localização" htmlFor="pfLocation">
             <Input id="pfLocation" maxLength={40} placeholder="ex: Lado Leste" className={inputClass} value={location} onChange={(e) => setLocation(e.target.value)} />
           </FormField>
@@ -350,7 +330,7 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
             <p className="text-ink-dim text-[0.85rem] mb-3">
               {linkStatus?.code ? (
                 <>
-                  Rode <code className="bg-panel-2 px-1.5 py-0.5 border border-line">/vincular codigo:{linkStatus.code}</code> no Discord — expira em 15 minutos.
+                  Rode <code className="bg-panel-2 px-1.5 py-0.5 border border-line">/vincular codigo:{linkStatus.code}</code> no Discord. Expira em 15 minutos.
                 </>
               ) : (
                 linkStatus?.text ?? 'Carregando...'

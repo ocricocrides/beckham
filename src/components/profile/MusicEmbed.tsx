@@ -1,4 +1,4 @@
-import { AudioPlayer } from './AudioPlayer';
+import { AudioPlayer, YouTubeAudioPlayer } from './AudioPlayer';
 
 const SPOTIFY_TYPES = ['track', 'album', 'playlist', 'episode', 'show', 'artist'];
 const SPOTIFY_TALL_TYPES = ['album', 'playlist', 'show', 'artist'];
@@ -18,19 +18,8 @@ export function MusicEmbed({ url }: { url: string }) {
     else if (parsed.pathname.startsWith('/shorts/')) videoId = parsed.pathname.split('/')[2];
     else videoId = parsed.searchParams.get('v') || '';
 
-    if (videoId) {
-      return (
-        <div className="mt-6 rounded-lg overflow-hidden">
-          <iframe
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1`}
-            title="Música"
-            className="w-full h-20 block border-0"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-      );
-    }
+    // Do YouTube só interessa o áudio: player escondido + os mesmos controles do .mp3.
+    if (videoId) return <YouTubeAudioPlayer videoId={videoId} />;
   }
 
   if (host === 'open.spotify.com') {

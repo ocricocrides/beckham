@@ -1,7 +1,18 @@
 import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
 
-type TableName = 'member_profiles' | 'roles' | 'member_roles' | 'crew_photos' | 'announcements' | 'action_ranking';
+type TableName =
+  | 'member_profiles'
+  | 'roles'
+  | 'member_roles'
+  | 'crew_photos'
+  | 'announcements'
+  | 'action_ranking'
+  | 'member_stream_platforms'
+  | 'featured_clips'
+  | 'clip_categories'
+  | 'wall_posts'
+  | 'site_registrations';
 type Listener = () => void;
 
 interface RealtimeContextValue {
@@ -21,6 +32,11 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       'crew_photos',
       'announcements',
       'action_ranking',
+      'member_stream_platforms',
+      'featured_clips',
+      'clip_categories',
+      'wall_posts',
+      'site_registrations',
     ];
     let channel = supabase.channel('site-changes');
     for (const table of tables) {
