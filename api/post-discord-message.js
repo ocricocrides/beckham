@@ -10,7 +10,7 @@
 //
 // Variáveis necessárias na Vercel (Production):
 //   DISCORD_BOT_TOKEN     — já configurada
-//   SUPABASE_SECRET_KEY   — já configurada (ver api/sync-discord-colors.js)
+//   SUPABASE_SECRET_KEY   — já configurada (Supabase → Project Settings → API Keys → Secret keys)
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://tywbicthevgfmukemxwg.supabase.co';
 const SUPABASE_ANON_KEY =
   process.env.VITE_SUPABASE_ANON_KEY ||

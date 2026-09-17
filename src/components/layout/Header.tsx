@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/lib/constants';
 import { useAuth } from '@/context/AuthContext';
@@ -13,7 +13,16 @@ export function Header() {
     // precisa mais compensar com padding. Fundo solido porque o conteudo ainda
     // passa por baixo quando ele gruda no topo.
     <header className="sticky top-0 z-[100] flex items-center justify-between px-[5vw] py-5 bg-void border-b border-line">
-      <div className="logo flex items-center gap-2.5">
+      <Link
+        to="/"
+        aria-label="Início"
+        className="logo flex items-center gap-2.5"
+        onClick={() => {
+          setNavOpen(false);
+          // Já no Início o link não muda de página, então só volta pro topo.
+          if (window.location.pathname === '/') window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      >
         <picture>
           <source srcSet="/assets/logo.webp" type="image/webp" />
           <img
@@ -25,7 +34,7 @@ export function Header() {
             loading="eager"
           />
         </picture>
-      </div>
+      </Link>
 
       <button
         className="hidden max-[760px]:block bg-none border border-line text-ink text-[1.3rem] leading-none px-3 py-1.5 cursor-pointer"

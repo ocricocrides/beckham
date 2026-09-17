@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { ChevronDown, Pencil, Check, X } from 'lucide-react';
 import { Btn } from '@/components/layout/Btn';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useRoles } from '@/hooks/useRoles';
-import { useDiscordRoles, type DiscordRole } from '@/hooks/useDiscordRoles';
 import { useConfirm } from '@/hooks/useConfirm';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { ColorPicker } from '@/components/ui/color-picker';
@@ -39,8 +38,6 @@ export default function AdminCargosPage() {
 
   const { refreshProfile } = useAuth();
   const { roles, reload: reloadRoles } = useRoles();
-  const { discordRoles, error: discordError, loading: discordLoading, reload: reloadDiscord } =
-    useDiscordRoles(true);
   const confirm = useConfirm();
 
   const [roleName, setRoleName] = useState('');
@@ -114,76 +111,6 @@ export default function AdminCargosPage() {
     reloadRoles();
     refreshProfile();
   }
-
-  /** Liga (ou desliga) um cargo do site a um cargo do Discord, herdando a cor de lá. */
-  async function handleDiscordLink(roleId: string, discordRoleId: string) {
-    const alvo = discordRoles?.find((d) => d.id === discordRoleId);
-    const patch = discordRoleId
-      ? { discord_role_id: discordRoleId, color: alvo?.color ?? null }
-      : { discord_role_id: null };
-    const { error } = await supabase.from('roles').update(patch).eq('id', roleId);
-    if (error) {
-      setMsgKind('error');
-      setMsg('Erro: ' + error.message);
-      return;
-    }
-    setMsgKind('success');
-    setMsg(discordRoleId ? `Cargo espelhado em "${alvo?.name}".` : 'Vínculo removido.');
-    reloadRoles();
-  }
-
-  /**
-   * Grava nos cargos vinculados a cor que está hoje no Discord. Devolve quantos mudaram.
-   * Cargo apagado lá não é mexido — melhor manter a cor antiga do que zerar sem aviso.
-   */
-  async function aplicarCoresDoDiscord(lista: DiscordRole[]) {
-    const vinculados = roles.filter((r) => r.discord_role_id);
-    let mudou = 0;
-    for (const r of vinculados) {
-      const d = lista.find((x) => x.id === r.discord_role_id);
-      if (!d || d.color === r.color) continue;
-      const { error } = await supabase.from('roles').update({ color: d.color }).eq('id', r.id);
-      if (!error) mudou++;
-    }
-    if (mudou > 0) {
-      reloadRoles();
-    }
-    return { vinculados: vinculados.length, mudou };
-  }
-
-  /** Botão manual: relê o Discord e aplica, sempre com resposta na tela. */
-  async function handleSyncDiscordColors() {
-    const lista = await reloadDiscord();
-    if (!lista) {
-      setMsgKind('error');
-      setMsg('Não consegui ler os cargos do Discord agora.');
-      return;
-    }
-    const { vinculados, mudou } = await aplicarCoresDoDiscord(lista);
-    setMsgKind('success');
-    setMsg(
-      vinculados === 0
-        ? 'Nenhum cargo está espelhado no Discord ainda.'
-        : mudou === 0
-          ? 'As cores já estavam em dia.'
-          : `${mudou} cor(es) atualizada(s) a partir do Discord.`,
-    );
-  }
-
-  // Sincronização automática: assim que os cargos do Discord chegam (uma vez por visita à
-  // página), as cores vinculadas são conferidas em silêncio. Só avisa na tela se algo mudou.
-  const autoSyncFeito = useRef(false);
-  useEffect(() => {
-    if (autoSyncFeito.current || !discordRoles || roles.length === 0) return;
-    autoSyncFeito.current = true;
-    aplicarCoresDoDiscord(discordRoles).then(({ mudou }) => {
-      if (mudou > 0) {
-        setMsgKind('success');
-        setMsg(`${mudou} cor(es) sincronizada(s) do Discord.`);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [discordRoles, roles]);
 
   function startRename(r: Role) {
     setRenamingId(r.id);
@@ -276,23 +203,9 @@ export default function AdminCargosPage() {
           </Btn>
         </form>
         <p className="mt-3 text-ink-dim text-[0.78rem]">
-          As permissões de postar/apagar fotos e anúncios, e o vínculo com o Discord, ficam editáveis no cargo depois
-          de criado. É só clicar nele na lista abaixo.
+          Os cargos do servidor do Discord aparecem aqui sozinhos, com o nome e a cor de lá e sem nenhuma permissão.
+          Crie aqui só cargos que existem apenas no site. As permissões ficam editáveis clicando no cargo na lista abaixo.
         </p>
-
-        <div className="mt-4 text-[0.78rem]">
-          {discordLoading && <span className="text-ink-dim">Lendo os cargos do Discord…</span>}
-          {discordError && <span className="text-brand">Discord indisponível: {discordError}</span>}
-          {discordRoles && (
-            <button
-              type="button"
-              onClick={handleSyncDiscordColors}
-              className="bg-none border border-line text-ink-dim hover:text-brand hover:border-brand transition-colors cursor-pointer px-2.5 py-1.5 tracking-wide"
-            >
-              Sincronizar cores do Discord
-            </button>
-          )}
-        </div>
       </div>
 
       <div className="mb-7">
@@ -315,7 +228,7 @@ export default function AdminCargosPage() {
                       recentes={coresEmUso}
                       title={
                         r.discord_role_id
-                          ? 'A cor vem do Discord. Desvincule pra editar na mão.'
+                          ? 'A cor vem do Discord. Mude por lá.'
                           : `Cor do cargo ${r.name}`
                       }
                       aria-label={`Cor do cargo ${r.name}`}
@@ -370,7 +283,7 @@ export default function AdminCargosPage() {
                         <X size={16} />
                       </button>
                     </>
-                  ) : (
+                  ) : r.discord_role_id ? null : (
                     <button
                       type="button"
                       title="Renomear cargo"
@@ -383,17 +296,19 @@ export default function AdminCargosPage() {
                       <Pencil size={14} />
                     </button>
                   )}
-                  <button
-                    type="button"
-                    title="Excluir cargo"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteRole(r.id);
-                    }}
-                    className="bg-none border-none text-ink-dim hover:text-brand cursor-pointer text-[1.1rem] leading-none px-1.5 py-0.5"
-                  >
-                    ×
-                  </button>
+                  {!r.discord_role_id && (
+                    <button
+                      type="button"
+                      title="Excluir cargo"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteRole(r.id);
+                      }}
+                      className="bg-none border-none text-ink-dim hover:text-brand cursor-pointer text-[1.1rem] leading-none px-1.5 py-0.5"
+                    >
+                      ×
+                    </button>
+                  )}
                   <ChevronDown
                     size={16}
                     className={cn('text-ink-dim transition-transform shrink-0', isOpen && 'rotate-180')}
@@ -514,23 +429,10 @@ export default function AdminCargosPage() {
                       </label>
                     </div>
 
-                    {discordRoles && (
-                      <label className="flex items-center gap-2 text-[0.78rem] text-ink-dim">
-                        <span className="shrink-0">Cor do Discord:</span>
-                        <select
-                          value={r.discord_role_id || ''}
-                          onChange={(e) => handleDiscordLink(r.id, e.target.value)}
-                          className={cn(selectClass, 'flex-1 min-w-0 text-[0.78rem] py-1')}
-                        >
-                          <option value="">Definir na mão</option>
-                          {discordRoles.map((d) => (
-                            <option key={d.id} value={d.id}>
-                              {d.name}
-                              {d.color ? ` (${d.color})` : ' (sem cor)'}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
+                    {r.discord_role_id && (
+                      <p className="text-[0.78rem] text-ink-dim">
+                        Cargo do Discord: nome e cor mudam por lá. Se for apagado lá, ele continua aqui como cargo só do site.
+                      </p>
                     )}
                   </div>
                 )}
