@@ -24,7 +24,8 @@ export function useDiscordWidget() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`https://discord.com/api/v10/invites/${DISCORD_INVITE_CODE}?with_counts=true`)
+    // no-store: a resposta do Discord não varia por origem, então um cache de outro site quebraria o CORS.
+    fetch(`https://discord.com/api/v10/invites/${DISCORD_INVITE_CODE}?with_counts=true`, { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (cancelled || !data || typeof data.approximate_member_count !== 'number') return;
