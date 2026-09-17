@@ -48,3 +48,17 @@ export function normalizeProfileRoles<T extends RawProfileWithMemberRoles>(
 export function isEffectiveAdmin(profile: MemberProfileWithRoles | null): boolean {
   return !!profile?.is_admin || !!profile?.roles.some((r) => r.is_admin);
 }
+
+/**
+ * Pode aprovar/rejeitar registro pelo site: o flag do perfil OU algum cargo com a permissão,
+ * e admin sempre pode. Espelha pode_revisar_registro() no banco (ver migração
+ * aprovar_registro_pelo_site) — quem manda de verdade é a função lá, essa aqui só decide o
+ * que aparece na tela.
+ */
+export function canReviewRegistrations(profile: MemberProfileWithRoles | null): boolean {
+  return (
+    isEffectiveAdmin(profile) ||
+    !!profile?.can_review_registrations ||
+    !!profile?.roles.some((r) => r.can_review_registrations)
+  );
+}

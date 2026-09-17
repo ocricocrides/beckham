@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export function Header() {
   const [navOpen, setNavOpen] = useState(false);
-  const { isAdmin, isMember, loading } = useAuth();
+  const { isAdmin, isMember, canReview, loading } = useAuth();
 
   return (
     // sticky (e nao fixed): ocupa o proprio espaco no fluxo, entao o main nao
@@ -86,9 +86,9 @@ export function Header() {
             Registro
           </NavLink>
         )}
-        {isAdmin && (
+        {(isAdmin || canReview) && (
           <NavLink
-            to="/admin"
+            to={isAdmin ? '/admin' : '/admin/registros'}
             onClick={() => setNavOpen(false)}
             className={({ isActive }) =>
               cn(

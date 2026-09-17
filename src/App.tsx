@@ -14,6 +14,7 @@ import AdminPage from '@/pages/AdminPage';
 import AdminInicioPage from '@/pages/AdminInicioPage';
 import AdminMembrosPage from '@/pages/AdminMembrosPage';
 import AdminCargosPage from '@/pages/AdminCargosPage';
+import AdminRegistrosPage from '@/pages/AdminRegistrosPage';
 import AdminDestaquesPage from '@/pages/AdminDestaquesPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
@@ -47,6 +48,7 @@ function App() {
           <Route index element={<AdminInicioPage />} />
           <Route path="membros" element={<AdminMembrosPage />} />
           <Route path="cargos" element={<AdminCargosPage />} />
+          <Route path="registros" element={<AdminRegistrosPage />} />
           <Route path="destaques" element={<AdminDestaquesPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />

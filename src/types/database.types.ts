@@ -402,6 +402,7 @@ export type Database = {
           can_delete_photos: boolean
           can_post_announcements: boolean
           can_post_photos: boolean
+          can_review_registrations: boolean
           card_role_id: string | null
           created_at: string
           discord_id: string | null
@@ -430,6 +431,7 @@ export type Database = {
           can_delete_photos?: boolean
           can_post_announcements?: boolean
           can_post_photos?: boolean
+          can_review_registrations?: boolean
           card_role_id?: string | null
           created_at?: string
           discord_id?: string | null
@@ -458,6 +460,7 @@ export type Database = {
           can_delete_photos?: boolean
           can_post_announcements?: boolean
           can_post_photos?: boolean
+          can_review_registrations?: boolean
           card_role_id?: string | null
           created_at?: string
           discord_id?: string | null
@@ -596,6 +599,7 @@ export type Database = {
           can_delete_photos: boolean
           can_post_announcements: boolean
           can_post_photos: boolean
+          can_review_registrations: boolean
           color: string | null
           created_at: string
           discord_role_id: string | null
@@ -612,6 +616,7 @@ export type Database = {
           can_delete_photos?: boolean
           can_post_announcements?: boolean
           can_post_photos?: boolean
+          can_review_registrations?: boolean
           color?: string | null
           created_at?: string
           discord_role_id?: string | null
@@ -628,6 +633,7 @@ export type Database = {
           can_delete_photos?: boolean
           can_post_announcements?: boolean
           can_post_photos?: boolean
+          can_review_registrations?: boolean
           color?: string | null
           created_at?: string
           discord_role_id?: string | null
@@ -643,7 +649,9 @@ export type Database = {
       }
       site_registrations: {
         Row: {
+          discord_applied_at: string | null
           discord_id: string
+          discord_messages: Json | null
           id_jogo: string
           member_id: string
           nome: string
@@ -651,12 +659,16 @@ export type Database = {
           recrutador: string
           reviewed_at: string | null
           reviewed_by_discord_id: string | null
+          reviewed_by_member_id: string | null
+          reviewed_source: string | null
           status: string
           submitted_at: string
           telefone: string
         }
         Insert: {
+          discord_applied_at?: string | null
           discord_id: string
+          discord_messages?: Json | null
           id_jogo: string
           member_id: string
           nome: string
@@ -664,12 +676,16 @@ export type Database = {
           recrutador: string
           reviewed_at?: string | null
           reviewed_by_discord_id?: string | null
+          reviewed_by_member_id?: string | null
+          reviewed_source?: string | null
           status?: string
           submitted_at?: string
           telefone: string
         }
         Update: {
+          discord_applied_at?: string | null
           discord_id?: string
+          discord_messages?: Json | null
           id_jogo?: string
           member_id?: string
           nome?: string
@@ -677,6 +693,8 @@ export type Database = {
           recrutador?: string
           reviewed_at?: string | null
           reviewed_by_discord_id?: string | null
+          reviewed_by_member_id?: string | null
+          reviewed_source?: string | null
           status?: string
           submitted_at?: string
           telefone?: string
@@ -686,6 +704,13 @@ export type Database = {
             foreignKeyName: "site_registrations_member_id_fkey"
             columns: ["member_id"]
             isOneToOne: true
+            referencedRelation: "member_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_registrations_reviewed_by_member_id_fkey"
+            columns: ["reviewed_by_member_id"]
+            isOneToOne: false
             referencedRelation: "member_profiles"
             referencedColumns: ["id"]
           },
@@ -738,7 +763,29 @@ export type Database = {
       can_delete_photos: { Args: { p_uid: string }; Returns: boolean }
       can_post_announcements: { Args: { p_uid: string }; Returns: boolean }
       can_post_photos: { Args: { p_uid: string }; Returns: boolean }
+      can_review_registrations: { Args: { p_uid: string }; Returns: boolean }
       is_effective_admin: { Args: { p_uid: string }; Returns: boolean }
+      listar_registros_pendentes: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          discord_id: string
+          display_name: string
+          id_jogo: string
+          member_id: string
+          nome: string
+          posted_at: string
+          recrutador: string
+          submitted_at: string
+          telefone: string
+          username: string
+        }[]
+      }
+      pode_revisar_registro: { Args: { p_uid: string }; Returns: boolean }
+      revisar_registro: {
+        Args: { p_aprovado: boolean; p_member_id: string }
+        Returns: undefined
+      }
       recompute_member_principal: {
         Args: { p_member_id: string }
         Returns: undefined

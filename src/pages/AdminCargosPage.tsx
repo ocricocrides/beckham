@@ -20,6 +20,7 @@ type RolePatch = Partial<
     | 'can_delete_photos'
     | 'can_post_announcements'
     | 'can_delete_announcements'
+    | 'can_review_registrations'
     | 'sort_order'
     | 'show_on_card'
     | 'is_streamer'
@@ -426,6 +427,16 @@ export default function AdminCargosPage() {
                           onChange={(checked) => handleRoleUpdate(r.id, { can_delete_announcements: checked })}
                         />
                         Apagar anúncios
+                      </label>
+                      <label
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => handleRoleUpdate(r.id, { can_review_registrations: !r.can_review_registrations })}
+                      >
+                        <Switch
+                          checked={r.can_review_registrations}
+                          onChange={(checked) => handleRoleUpdate(r.id, { can_review_registrations: checked })}
+                        />
+                        Aprovar registros
                       </label>
                     </div>
 

@@ -15,13 +15,15 @@ export type MemberPermissionColumn =
   | 'can_post_photos'
   | 'can_delete_photos'
   | 'can_post_announcements'
-  | 'can_delete_announcements';
+  | 'can_delete_announcements'
+  | 'can_review_registrations';
 
 const PERMISSION_LABELS: Record<MemberPermissionColumn, string> = {
   can_post_photos: 'Pode postar fotos',
   can_delete_photos: 'Pode apagar fotos',
   can_post_announcements: 'Pode postar anúncios',
   can_delete_announcements: 'Pode apagar anúncios',
+  can_review_registrations: 'Pode aprovar registros',
 };
 
 export function MemberEditModal({

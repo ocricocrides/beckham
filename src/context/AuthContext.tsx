@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { supabase, MEMBER_ROLES_SELECT, normalizeProfileRoles, isEffectiveAdmin } from '@/lib/supabase';
+import { supabase, MEMBER_ROLES_SELECT, normalizeProfileRoles, isEffectiveAdmin, canReviewRegistrations } from '@/lib/supabase';
 import type { MemberProfileWithRoles } from '@/lib/supabase';
 import { useRealtimeTable } from '@/context/RealtimeContext';
 
@@ -11,6 +11,8 @@ interface AuthContextValue {
   isAdmin: boolean;
   /** Registro aprovado pela staff no Discord: só membro usa o site como membro. */
   isMember: boolean;
+  /** Pode abrir a aba de registros e aprovar/rejeitar por lá (admin ou permissão do cargo). */
+  canReview: boolean;
   loading: boolean;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -76,7 +78,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, profile, isAdmin: isEffectiveAdmin(profile), isMember: !!profile?.is_member, loading, refreshProfile, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        isAdmin: isEffectiveAdmin(profile),
+        isMember: !!profile?.is_member,
+        canReview: canReviewRegistrations(profile),
+        loading,
+        refreshProfile,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
