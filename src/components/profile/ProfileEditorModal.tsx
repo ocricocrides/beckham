@@ -25,7 +25,7 @@ async function uploadMedia(userId: string, file: File, kind: 'avatar' | 'banner'
 }
 
 export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const { user, profile, refreshProfile, signOut } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
 
   const [displayName, setDisplayName] = useState('');
   const [location, setLocation] = useState('');
@@ -172,11 +172,6 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
     } finally {
       setSaving(false);
     }
-  }
-
-  async function handleLogout() {
-    await signOut();
-    onOpenChange(false);
   }
 
   const subcargos = profile?.roles.filter((r) => r.tipo === 'secundario') ?? [];
@@ -345,9 +340,6 @@ export function ProfileEditorModal({ open, onOpenChange }: { open: boolean; onOp
 
           <Btn type="submit" variant="primary" disabled={saving || hasSocialErrors}>
             Salvar perfil
-          </Btn>
-          <Btn type="button" variant="outline" onClick={handleLogout}>
-            Sair da conta
           </Btn>
           <div className={cn('text-[0.85rem] min-h-[1.2em] text-ink-dim', msgKind === 'error' && 'text-brand', msgKind === 'success' && 'text-[#3ddc84]')}>
             {msg}

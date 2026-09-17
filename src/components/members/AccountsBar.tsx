@@ -6,7 +6,7 @@ import { ProfileEditorModal } from '@/components/profile/ProfileEditorModal';
 import { Btn } from '@/components/layout/Btn';
 
 export function AccountsBar() {
-  const { user, profile, isMember } = useAuth();
+  const { user, profile, isMember, signOut } = useAuth();
   const navigate = useNavigate();
   const [authOpen, setAuthOpen] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
@@ -33,6 +33,9 @@ export function AccountsBar() {
               Finalizar registro
             </Btn>
           )}
+          <Btn variant="outline" onClick={signOut}>
+            Sair da conta
+          </Btn>
         </div>
       )}
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
