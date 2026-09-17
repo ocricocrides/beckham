@@ -1,13 +1,12 @@
 export const DEFAULT_AVATAR = '/assets/perfil-default.webp';
 export const DEFAULT_BANNER = '/assets/banner.png';
 
-// Guild da BECKHAM (a mesma por trás do convite discord.gg/beckham). A contagem de online só
-// aparece se o "Widget do servidor" estiver ligado nas configurações do Discord — hoje está
-// desligado, então o widget devolve 403 e a página cai no convite fixo abaixo.
+// Guild da BECKHAM (convite permanente, sem expiração).
 export const DISCORD_GUILD_ID = '1065057205201678436';
 
 // Único canal de suporte e contato da organização.
-export const DISCORD_INVITE = 'https://discord.gg/beckham';
+export const DISCORD_INVITE_CODE = 'nTzzbPgmw2';
+export const DISCORD_INVITE = `https://discord.gg/${DISCORD_INVITE_CODE}`;
 
 // Canal #ticket (categoria ENTRE EM CONTATO) criado pelo bot. Enquanto o ID do canal não for
 // preenchido, os botões de "abrir ticket" caem no convite do servidor.

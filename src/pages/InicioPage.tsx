@@ -29,6 +29,11 @@ export default function InicioPage() {
     'Começou como uma família no SA-MP em 2018 e virou organização. Membros, streamers, clipes e ranking da BECKHAM.',
   );
   const widget = useDiscordWidget();
+  // Total do Discord arredondado pra baixo em milhares (2286 vira 2K+).
+  const members =
+    widget.memberCount >= 1000
+      ? { value: Math.floor(widget.memberCount / 1000), suffix: 'K+' }
+      : { value: widget.memberCount, suffix: '+' };
 
   return (
     <div className="relative flex-1 flex flex-col">
@@ -56,10 +61,10 @@ export default function InicioPage() {
             <RotatingText items={TAGLINES} className="justify-items-center" />
           </p>
 
-          {/* O convite fixo sempre aparece — é o único canal de contato. A bolinha de "online" só
-              entra quando o widget do Discord responde (precisa estar ligado nas configs do server). */}
+          {/* O convite fixo sempre aparece, é o único canal de contato. A bolinha de "online" só
+              entra quando a API do Discord responde. */}
           <div className="mt-6 flex items-center justify-center gap-3.5 flex-wrap text-ink-dim text-[0.9rem]">
-            {widget && (
+            {widget.presenceCount !== null && (
               <>
                 <span
                   className="w-[9px] h-[9px] rounded-full bg-[#3ddc84] inline-block"
@@ -69,7 +74,7 @@ export default function InicioPage() {
               </>
             )}
             <Btn asChild variant="outline">
-              <a href={widget?.inviteUrl || DISCORD_INVITE} target="_blank" rel="noopener noreferrer">
+              <a href={DISCORD_INVITE} target="_blank" rel="noopener noreferrer">
                 Entrar no Discord
               </a>
             </Btn>
@@ -84,8 +89,8 @@ export default function InicioPage() {
               <div className="text-[0.8rem] text-ink-dim tracking-wide mt-1">FUNDAÇÃO</div>
             </div>
             <div className="flex-1 basis-1/2 min-[701px]:basis-auto min-[701px]:px-10 pt-[22px] pb-4 min-[701px]:pb-0 border-b min-[701px]:border-b-0 border-line text-center">
-              <CountUp value={40} suffix="+" className="block text-[2.1rem] leading-[2.4rem] font-bold text-brand font-display" />
-              <div className="text-[0.8rem] text-ink-dim tracking-wide mt-1">MEMBROS ATIVOS</div>
+              <CountUp value={members.value} suffix={members.suffix} className="block text-[2.1rem] leading-[2.4rem] font-bold text-brand font-display" />
+              <div className="text-[0.8rem] text-ink-dim tracking-wide mt-1">NA COMUNIDADE</div>
             </div>
             <div className="flex-1 basis-full min-[701px]:basis-auto min-[701px]:px-10 pt-[22px] pb-0 text-center min-w-[240px]">
               <div className="text-[1.4rem] leading-[2.4rem] tracking-wide font-bold text-brand font-display">
