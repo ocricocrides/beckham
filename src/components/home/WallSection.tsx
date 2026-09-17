@@ -141,7 +141,7 @@ export function WallSection() {
               key={post.id}
               index={i}
               post={post}
-              canDelete={isAdmin || post.member_id === user?.id}
+              canDelete={isAdmin}
               onDelete={() => handleDelete(post)}
             />
           ))}
