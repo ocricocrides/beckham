@@ -4,7 +4,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useGallery, useGalleryTrash } from '@/hooks/useGallery';
 import { useConfirm } from '@/hooks/useConfirm';
 import { supabase } from '@/lib/supabase';
-import { logDiscordAction } from '@/lib/discordLog';
 import { formatDate } from '@/lib/utils';
 import { Btn } from '@/components/layout/Btn';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -15,13 +14,6 @@ import type { CrewPhoto } from '@/hooks/useGallery';
 /** "@fulano" de quem postou, ou null se a foto for de antes dessa informação existir. */
 function quemPostou(p: CrewPhoto) {
   return p.posted_by_display_name || p.posted_by_username || null;
-}
-
-/** Pra mandar no log do Discord: marca (@menção real) quem postou, se a conta tiver Discord vinculado. */
-function quemPostouParaDiscord(p: CrewPhoto) {
-  if (p.posted_by_discord_id) return `<@${p.posted_by_discord_id}>`;
-  const quem = quemPostou(p);
-  return quem ? `@${quem}` : null;
 }
 
 export function GalleryGrid() {
@@ -41,13 +33,9 @@ export function GalleryGrid() {
       .from('crew_photos')
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', p.id);
+    // O log no Discord sai do próprio banco (trigger em crew_photos).
     if (error) alert('Erro ao excluir: ' + error.message);
-    else {
-      reload();
-      const quem = quemPostouParaDiscord(p);
-      const subject = `${p.title} (postada${quem ? ` por ${quem}` : ''} em ${formatDate(p.created_at)})`;
-      logDiscordAction('delete_photo', subject, p.image_url);
-    }
+    else reload();
   }
 
   const toolbar = (canPost || canDelete) && (
@@ -139,10 +127,7 @@ function GalleryTrashModal({ open, onOpenChange }: { open: boolean; onOpenChange
     if (!(await confirm('Restaurar essa foto? Ela volta a aparecer na galeria.'))) return;
     const { error } = await supabase.from('crew_photos').update({ deleted_at: null }).eq('id', p.id);
     if (error) alert('Erro ao restaurar: ' + error.message);
-    else {
-      reload();
-      logDiscordAction('restore_photo', p.title, p.image_url);
-    }
+    else reload();
   }
 
   return (

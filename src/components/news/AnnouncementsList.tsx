@@ -4,8 +4,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useAnnouncements, useAnnouncementsTrash } from '@/hooks/useAnnouncements';
 import { useConfirm } from '@/hooks/useConfirm';
 import { supabase } from '@/lib/supabase';
-import { logDiscordAction } from '@/lib/discordLog';
-import { formatDate } from '@/lib/utils';
 import { Btn } from '@/components/layout/Btn';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { CreateAnnouncementModal } from './CreateAnnouncementModal';
@@ -14,13 +12,6 @@ import type { Announcement } from '@/hooks/useAnnouncements';
 /** "@fulano" de quem postou, ou null se o anúncio for de antes dessa informação existir. */
 function quemPostou(a: Announcement) {
   return a.posted_by_display_name || a.posted_by_username || null;
-}
-
-/** Pra mandar no log do Discord: marca (@menção real) quem postou, se a conta tiver Discord vinculado. */
-function quemPostouParaDiscord(a: Announcement) {
-  if (a.posted_by_discord_id) return `<@${a.posted_by_discord_id}>`;
-  const quem = quemPostou(a);
-  return quem ? `@${quem}` : null;
 }
 
 export function AnnouncementsList() {
@@ -41,13 +32,9 @@ export function AnnouncementsList() {
       .from('announcements')
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', a.id);
+    // O log no Discord sai do próprio banco (trigger em announcements).
     if (error) alert('Erro ao excluir: ' + error.message);
-    else {
-      reload();
-      const quem = quemPostouParaDiscord(a);
-      const subject = `${a.title} (postado${quem ? ` por ${quem}` : ''} em ${formatDate(a.created_at)})`;
-      logDiscordAction('delete_announcement', subject, a.image_url);
-    }
+    else reload();
   }
 
   const toolbar = (canPost || canDelete) && (
@@ -125,10 +112,7 @@ function AnnouncementsTrashModal({ open, onOpenChange }: { open: boolean; onOpen
     if (!(await confirm('Restaurar esse anúncio? Ele volta a aparecer na lista.'))) return;
     const { error } = await supabase.from('announcements').update({ deleted_at: null }).eq('id', a.id);
     if (error) alert('Erro ao restaurar: ' + error.message);
-    else {
-      reload();
-      logDiscordAction('restore_announcement', a.title, a.image_url);
-    }
+    else reload();
   }
 
   return (

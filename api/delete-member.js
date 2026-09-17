@@ -25,6 +25,39 @@ async function getUserIdFromToken(accessToken) {
   return data?.id || null;
 }
 
+function serviceHeaders(serviceKey) {
+  return { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, 'Content-Type': 'application/json' };
+}
+
+async function getProfile(userId, serviceKey) {
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/member_profiles?id=eq.${userId}&select=username,display_name,discord_id`,
+    { headers: serviceHeaders(serviceKey) },
+  );
+  if (!r.ok) return null;
+  const rows = await r.json();
+  return rows[0] || null;
+}
+
+// Os outros logs do site saem de triggers no banco; a exclusão de conta é feita com a service
+// role (sem usuário logado no banco), então o log é gravado aqui, já com quem pediu.
+async function logExclusao(caller, target, serviceKey) {
+  const alvo = target
+    ? target.discord_id ? `<@${target.discord_id}> (@${target.username})` : `@${target.username}`
+    : 'conta sem perfil';
+  await fetch(`${SUPABASE_URL}/rest/v1/discord_action_log`, {
+    method: 'POST',
+    headers: { ...serviceHeaders(serviceKey), Prefer: 'return=minimal' },
+    body: JSON.stringify({
+      action: 'delete_profile',
+      subject: alvo,
+      actor_display_name: caller?.display_name || null,
+      actor_username: caller?.username || null,
+      actor_discord_id: caller?.discord_id || null,
+    }),
+  }).catch(() => {});
+}
+
 async function isEffectiveAdmin(userId, serviceKey) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/is_effective_admin`, {
     method: 'POST',
@@ -72,6 +105,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    const [caller, target] = await Promise.all([getProfile(callerId, serviceKey), getProfile(memberId, serviceKey)]);
     const r = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${memberId}`, {
       method: 'DELETE',
       headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
@@ -80,6 +114,7 @@ export default async function handler(req, res) {
       const detalhe = await r.text();
       return res.status(502).send(JSON.stringify({ error: 'Supabase recusou excluir a conta.', dica: detalhe }));
     }
+    if (r.ok) await logExclusao(caller, target, serviceKey);
     return res.status(200).send(JSON.stringify({ ok: true }));
   } catch (e) {
     return res.status(500).send(JSON.stringify({ error: 'Falha ao excluir a conta.', dica: e.message }));

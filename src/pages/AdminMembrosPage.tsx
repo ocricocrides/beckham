@@ -7,17 +7,10 @@ import { useStreamPlatforms, type StreamPlatform } from '@/hooks/useStreamPlatfo
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { useConfirm } from '@/hooks/useConfirm';
 import { supabase } from '@/lib/supabase';
-import { logDiscordAction } from '@/lib/discordLog';
 import { DEFAULT_AVATAR } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { MemberEditModal, type MemberPermissionColumn } from '@/components/admin/MemberEditModal';
 import type { MemberProfileWithRoles } from '@/lib/supabase';
-
-/** Marca (@menção real) o membro se a conta dele tiver Discord vinculado, senão cai pro @username. */
-function marcarMembro(membro: MemberProfileWithRoles | undefined, fallbackId: string) {
-  if (membro?.discord_id) return `<@${membro.discord_id}>`;
-  return `@${membro?.username ?? fallbackId}`;
-}
 
 export default function AdminMembrosPage() {
   usePageMeta('Membros // Painel ADM', 'Gestão dos cargos e permissões de cada membro da BECKHAM.');
@@ -92,7 +85,6 @@ export default function AdminMembrosPage() {
   }
 
   async function handleRenameDisplayName(memberId: string, newName: string) {
-    const membro = profiles?.find((p) => p.id === memberId);
     const { error } = await supabase.from('member_profiles').update({ display_name: newName }).eq('id', memberId);
     if (error) {
       setMsgKind('error');
@@ -103,7 +95,6 @@ export default function AdminMembrosPage() {
     if (memberId === user?.id) refreshProfile();
     setMsgKind('success');
     setMsg('Nome atualizado.');
-    logDiscordAction('rename_profile', `${marcarMembro(membro, memberId)} → ${newName}`);
   }
 
   async function handleDeleteAccount(memberId: string) {
@@ -135,7 +126,6 @@ export default function AdminMembrosPage() {
     reloadProfiles();
     setMsgKind('success');
     setMsg('Conta excluída.');
-    logDiscordAction('delete_profile', marcarMembro(membro, memberId));
   }
 
   const editing: MemberProfileWithRoles | null = profiles?.find((p) => p.id === editingId) ?? null;

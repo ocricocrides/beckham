@@ -10,7 +10,6 @@ import { useConfirm } from '@/hooks/useConfirm';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { Switch } from '@/components/ui/switch';
-import { logDiscordAction } from '@/lib/discordLog';
 import type { Role } from '@/lib/supabase';
 
 type RolePatch = Partial<
@@ -199,7 +198,6 @@ export default function AdminCargosPage() {
   async function handleRenameRole(id: string) {
     const novoNome = renameValue.trim();
     if (!novoNome) return;
-    const nomeAntigo = roles.find((r) => r.id === id)?.name;
     const { error } = await supabase.from('roles').update({ name: novoNome }).eq('id', id);
     if (error) {
       setMsgKind('error');
@@ -212,9 +210,6 @@ export default function AdminCargosPage() {
     setRenameValue('');
     reloadRoles();
     refreshProfile();
-    if (nomeAntigo && nomeAntigo !== novoNome) {
-      logDiscordAction('rename_role', `${nomeAntigo} → ${novoNome}`);
-    }
   }
 
   async function handleDeleteRole(id: string) {
