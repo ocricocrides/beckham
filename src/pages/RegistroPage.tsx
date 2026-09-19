@@ -163,10 +163,9 @@ function FormStep() {
         <FormField label="Nome do membro" htmlFor="regNome">
           <Input id="regNome" required maxLength={32} placeholder="Ex: João Silva" disabled={!linked} className={inputClass} value={nome} onChange={(e) => setNome(e.target.value)} />
         </FormField>
-        <FormField label="Número de telefone" htmlFor="regTelefone">
+        <FormField label="Número de telefone (opcional)" htmlFor="regTelefone">
           <Input
             id="regTelefone"
-            required
             type="tel"
             maxLength={20}
             placeholder="Ex: 11987654321"

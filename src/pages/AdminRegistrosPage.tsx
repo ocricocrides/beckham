@@ -110,7 +110,7 @@ export default function AdminRegistrosPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 mb-4">
               <Campo rotulo="ID no jogo" valor={r.id_jogo} />
               <Campo rotulo="Nome" valor={r.nome} />
-              <Campo rotulo="Telefone" valor={r.telefone} />
+              <Campo rotulo="Telefone" valor={r.telefone || 'Não informado'} />
               <Campo rotulo="Recrutador" valor={r.recrutador} />
             </div>
 
