@@ -8,9 +8,10 @@ export const DISCORD_GUILD_ID = '1065057205201678436';
 export const DISCORD_INVITE_CODE = 'nTzzbPgmw2';
 export const DISCORD_INVITE = `https://discord.gg/${DISCORD_INVITE_CODE}`;
 
-// Canal #ticket (categoria ENTRE EM CONTATO) criado pelo bot. Enquanto o ID do canal não for
-// preenchido, os botões de "abrir ticket" caem no convite do servidor.
-export const TICKET_CHANNEL_ID = '';
+// Canal #ticket (categoria ENTRE EM CONTATO) criado pelo bot no servidor oficial. Vazio faz os
+// botões de "abrir ticket" caírem no convite do servidor. Se o /configurar recriar o canal, o ID
+// novo está em config_servidores (chave ticketChannelId do servidor oficial).
+export const TICKET_CHANNEL_ID = '1550695054325325864';
 export const TICKET_URL = TICKET_CHANNEL_ID
   ? `https://discord.com/channels/${DISCORD_GUILD_ID}/${TICKET_CHANNEL_ID}`
   : DISCORD_INVITE;
