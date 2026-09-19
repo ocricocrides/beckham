@@ -4,11 +4,23 @@ import { Btn } from '@/components/layout/Btn';
 import { useAuth } from '@/context/AuthContext';
 import { useConfirm } from '@/hooks/useConfirm';
 import { usePageMeta } from '@/hooks/usePageMeta';
-import { usePendingRegistrations, type PendingRegistration } from '@/hooks/usePendingRegistrations';
+import {
+  usePendingRegistrations,
+  type PendingRegistration,
+  type ReviewedRegistration,
+} from '@/hooks/usePendingRegistrations';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 
 const dataHora = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+
+const ORIGEM_REVISAO: Record<string, string> = { site: 'pelo site', discord: 'pelo Discord' };
+
+function fimDoRegistro(r: ReviewedRegistration) {
+  const resultado = r.status === 'aprovado' ? 'Aprovado' : 'Rejeitado';
+  const origem = r.reviewed_source ? ORIGEM_REVISAO[r.reviewed_source] : null;
+  return { resultado, detalhe: [origem, r.revisor ? `por ${r.revisor}` : null].filter(Boolean).join(' ') };
+}
 
 function Campo({ rotulo, valor }: { rotulo: string; valor: string }) {
   return (
@@ -23,7 +35,7 @@ export default function AdminRegistrosPage() {
   usePageMeta('Registros // Painel ADM', 'Registros enviados pelo site aguardando aprovação da BECKHAM.');
 
   const { canReview } = useAuth();
-  const { registrations, reload } = usePendingRegistrations();
+  const { registrations, reviewed, error: erroCarga, reload } = usePendingRegistrations();
   const confirm = useConfirm();
 
   const [emAndamento, setEmAndamento] = useState<string | null>(null);
@@ -68,10 +80,12 @@ export default function AdminRegistrosPage() {
   return (
     <div>
       <div className="text-ink-dim text-[0.9rem] leading-relaxed mb-6">
-        Registros enviados pelo site que ainda não foram revisados. Aprovar aqui faz o mesmo que
-        aprovar pelo Discord: o bot dá o cargo, ajusta o apelido, libera o acesso de membro no
-        site e manda a mensagem direta.
+        Todo registro, enviado pelo site ou pelo formulário do Discord, aparece aqui. Aprovar aqui
+        faz o mesmo que aprovar pelo Discord: o bot dá o cargo, ajusta o apelido, libera o acesso
+        de membro no site e manda a mensagem direta.
       </div>
+
+      {erroCarga && <p className="text-brand text-[0.85rem] mb-5">{erroCarga}</p>}
 
       {msg && (
         <p
@@ -86,7 +100,7 @@ export default function AdminRegistrosPage() {
 
       {registrations === undefined && <p className="text-ink-dim text-[0.9rem]">Carregando...</p>}
 
-      {registrations?.length === 0 && (
+      {registrations?.length === 0 && !erroCarga && (
         <p className="text-ink-dim text-[0.9rem]">Nenhum registro aguardando revisão.</p>
       )}
 
@@ -140,6 +154,52 @@ export default function AdminRegistrosPage() {
           </div>
         ))}
       </div>
+
+      {reviewed && reviewed.length > 0 && (
+        <div className="mt-10">
+          <h2 className="text-ink font-bold text-[1rem] mb-1">Já revisados</h2>
+          <p className="text-ink-dim text-[0.8rem] mb-4">
+            Os 30 mais recentes, com o resultado e por onde foram decididos.
+          </p>
+
+          <div className="flex flex-col gap-3">
+            {reviewed.map((r) => {
+              const { resultado, detalhe } = fimDoRegistro(r);
+              return (
+                <div key={r.member_id} className="bg-panel border border-line p-4">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-3">
+                    <div className="min-w-0">
+                      <span className="text-ink font-bold text-[0.9rem]">{r.display_name}</span>{' '}
+                      <span className="text-ink-dim text-[0.8rem]">@{r.username}</span>
+                    </div>
+                    <div
+                      className={cn(
+                        'text-[0.85rem] font-bold',
+                        r.status === 'aprovado' ? 'text-ink' : 'text-brand',
+                      )}
+                    >
+                      {resultado}
+                      {detalhe && <span className="font-normal text-ink-dim"> {detalhe}</span>}
+                    </div>
+                    {r.reviewed_at && (
+                      <div className="text-ink-dim text-[0.78rem]">
+                        {dataHora.format(new Date(r.reviewed_at))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3">
+                    <Campo rotulo="ID no jogo" valor={r.id_jogo} />
+                    <Campo rotulo="Nome" valor={r.nome} />
+                    <Campo rotulo="Telefone" valor={r.telefone || 'Não informado'} />
+                    <Campo rotulo="Recrutador" valor={r.recrutador} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -196,8 +196,19 @@ export default function RegistroPage() {
   const navigate = useNavigate();
 
   let content: ReactNode;
-  if (loading || (user && !profile)) {
+  if (loading) {
     content = <div className="skeleton h-[240px]" />;
+  } else if (user && !profile) {
+    // Nunca deixar a tela presa: se o perfil não carregou, a pessoa consegue sair e tentar de novo.
+    content = (
+      <div className="bg-panel border border-line p-6">
+        <p className="text-ink font-bold mb-2">Não conseguimos carregar sua conta.</p>
+        <p className="text-ink-dim text-[0.9rem] mb-5">Saia e entre de novo, ou crie uma conta nova.</p>
+        <Btn variant="outline" onClick={signOut}>
+          Sair da conta
+        </Btn>
+      </div>
+    );
   } else if (!user) {
     content = (
       <div className="bg-panel border border-line p-6">

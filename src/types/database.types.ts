@@ -781,6 +781,23 @@ export type Database = {
           username: string
         }[]
       }
+      listar_registros_revisados: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          display_name: string
+          id_jogo: string
+          member_id: string
+          nome: string
+          recrutador: string
+          reviewed_at: string
+          reviewed_source: string
+          revisor: string
+          status: string
+          telefone: string
+          username: string
+        }[]
+      }
       pode_revisar_registro: { Args: { p_uid: string }; Returns: boolean }
       revisar_registro: {
         Args: { p_aprovado: boolean; p_member_id: string }

@@ -31,6 +31,18 @@ async function ensureProfile(user: User) {
   await supabase.from('member_profiles').insert({ id: user.id, username, display_name: username });
 }
 
+// Conta excluída (painel ADM ou bot) enquanto o navegador ainda guarda o login dela: o token local
+// continua "válido" até vencer, mas o usuário não existe mais no Supabase. Sem isso a pessoa ficava
+// presa numa sessão fantasma (logada, sem perfil, sem como criar conta nova). Só descarta a sessão
+// quando o servidor diz que ela não vale mais; falha de rede não desloga ninguém. O signOut local
+// não fala com o servidor (a conta já não existe lá) e dispara SIGNED_OUT.
+async function descartarSessaoSeContaNaoExiste() {
+  const { error } = await supabase.auth.getUser();
+  if (error && (error.status === 401 || error.status === 403 || error.status === 404)) {
+    await supabase.auth.signOut({ scope: 'local' });
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<MemberProfileWithRoles | null>(null);
@@ -47,18 +59,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .eq('id', currentUser.id)
       .maybeSingle();
     setProfile(data ? normalizeProfileRoles(data) : null);
+    // setTimeout: chamar o Auth de dentro do onAuthStateChange trava o cliente.
+    if (!data) setTimeout(() => void descartarSessaoSeContaNaoExiste(), 0);
   }, []);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const currentUser = session?.user ?? null;
-      setUser(currentUser);
       if (currentUser) {
         await ensureProfile(currentUser);
         await loadMyProfile(currentUser);
       } else {
         setProfile(null);
       }
+      // O usuário só entra no estado depois do perfil carregado, pra não aparecer "logado sem perfil".
+      setUser(currentUser);
       setLoading(false);
     });
     return () => sub.subscription.unsubscribe();
